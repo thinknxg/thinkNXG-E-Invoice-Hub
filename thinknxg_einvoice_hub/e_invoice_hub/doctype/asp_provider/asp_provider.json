@@ -1,0 +1,164 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "provider_name",
+  "provider_code",
+  "status",
+  "cb1",
+  "website",
+  "adapter_class",
+  "sb_cap",
+  "supports_submit",
+  "supports_status",
+  "cb2",
+  "supports_inbound",
+  "supports_webhooks",
+  "sb_desc",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "provider_name",
+   "fieldtype": "Data",
+   "label": "Provider Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "provider_code",
+   "fieldtype": "Data",
+   "label": "Provider Code",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Available\nBeta\nDevelopment\nPlanned",
+   "default": "Planned",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "website",
+   "fieldtype": "Data",
+   "label": "Website",
+   "length": 255
+  },
+  {
+   "fieldname": "adapter_class",
+   "fieldtype": "Data",
+   "label": "Adapter Class",
+   "read_only": 1,
+   "length": 255,
+   "description": "Resolved from the adapter registry; informational."
+  },
+  {
+   "fieldname": "sb_cap",
+   "fieldtype": "Section Break",
+   "label": "Advertised Capabilities"
+  },
+  {
+   "fieldname": "supports_submit",
+   "fieldtype": "Check",
+   "label": "Supports Submission",
+   "read_only": 1
+  },
+  {
+   "fieldname": "supports_status",
+   "fieldtype": "Check",
+   "label": "Supports Status Query",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "supports_inbound",
+   "fieldtype": "Check",
+   "label": "Supports Inbound Documents",
+   "read_only": 1
+  },
+  {
+   "fieldname": "supports_webhooks",
+   "fieldtype": "Check",
+   "label": "Supports Webhooks",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_desc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "ASP Provider",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Tenant Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  },
+  {
+   "role": "E-Invoice Hub User",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "autoname": "field:provider_code",
+ "naming_rule": "By fieldname",
+ "title_field": "provider_name"
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "document": {
+    "document_type": "INVOICE",
+    "invoice_kind": "TAX",
+    "invoice_number": "INV-2026-001",
+    "invoice_date": "2026-11-11",
+    "due_date": "2026-12-11",
+    "currency": "AED",
+    "direction": "OUTBOUND",
+    "transaction_type_flags": "00000000"
+  },
+  "supplier": {
+    "legal_name": "ABC Trading LLC",
+    "tax_id": "100000000000003",
+    "legal_registration_id": "CN-1234567",
+    "legal_registration_type": "TL",
+    "address": {"street": "Sheikh Zayed Road", "city": "Dubai", "subdivision": "DXB", "country": "AE"}
+  },
+  "customer": {
+    "legal_name": "XYZ LLC",
+    "tax_id": "100234567800003",
+    "address": {"street": "Corniche Road", "city": "Abu Dhabi", "subdivision": "AUH", "country": "AE"}
+  },
+  "lines": [
+    {
+      "item_code": "ITEM-001",
+      "item_name": "Consulting Service",
+      "quantity": 2,
+      "unit_code": "HUR",
+      "unit_price": 1000,
+      "tax_category": "STANDARD",
+      "tax_rate": 5,
+      "tax_amount": 100
+    }
+  ],
+  "totals": {"subtotal": 2000, "tax_total": 100, "grand_total": 2100},
+  "payment": {"means_code": "30", "terms": "Net 30"},
+  "references": {"erp_name": "SAP", "erp_document_id": "100001"}
+}

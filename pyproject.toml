@@ -1,0 +1,21 @@
+[project]
+name = "thinknxg_einvoice_hub"
+authors = [{ name = "Kreatao" }]
+description = "thinkNXG E-Invoice Hub - universal e-invoicing integration platform"
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = ["requests"]
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.bench.frappe-dependencies]
+frappe = ">=16.0.0-dev,<17.0.0"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.format]
+indent-style = "tab"

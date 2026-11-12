@@ -1,0 +1,81 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "scope",
+  "source_path",
+  "canonical_path",
+  "transform",
+  "transform_arg",
+  "default_value",
+  "required"
+ ],
+ "fields": [
+  {
+   "fieldname": "scope",
+   "fieldtype": "Select",
+   "label": "Scope",
+   "options": "Header\nLine",
+   "default": "Header",
+   "in_list_view": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "source_path",
+   "fieldtype": "Data",
+   "label": "ERP Field Path",
+   "in_list_view": 1,
+   "length": 255
+  },
+  {
+   "fieldname": "canonical_path",
+   "fieldtype": "Data",
+   "label": "Canonical Field Path",
+   "in_list_view": 1,
+   "reqd": 1,
+   "length": 255
+  },
+  {
+   "fieldname": "transform",
+   "fieldtype": "Select",
+   "label": "Transform",
+   "in_list_view": 1,
+   "options": "None\nUpper\nLower\nStrip\nDate\nNumber\nValue Map\nConstant\nBoolean",
+   "default": "None"
+  },
+  {
+   "fieldname": "transform_arg",
+   "fieldtype": "Small Text",
+   "label": "Transform Argument",
+   "description": "Date: input format (e.g. %d/%m/%Y). Value Map: JSON object. Constant: the value."
+  },
+  {
+   "fieldname": "default_value",
+   "fieldtype": "Data",
+   "label": "Default Value"
+  },
+  {
+   "fieldname": "required",
+   "fieldtype": "Check",
+   "label": "Required",
+   "in_list_view": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "Mapping Rule",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0,
+ "editable_grid": 1
+}

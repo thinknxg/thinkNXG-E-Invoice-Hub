@@ -1,0 +1,202 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "settings_name",
+  "tenant",
+  "company_profile",
+  "environment",
+  "cb0",
+  "integration_status",
+  "accreditation_number",
+  "sb_conn",
+  "asp_connection",
+  "rest_configuration",
+  "cb1",
+  "participant_tin",
+  "participant_id",
+  "sb_ready",
+  "readiness_html",
+  "last_test_status",
+  "last_tested_on",
+  "sb_notes",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "settings_name",
+   "fieldtype": "Data",
+   "label": "Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "label": "Tenant",
+   "options": "Integration Tenant",
+   "reqd": 1,
+   "in_list_view": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "company_profile",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company Integration Profile"
+  },
+  {
+   "fieldname": "environment",
+   "fieldtype": "Select",
+   "label": "Environment",
+   "options": "Sandbox\nProduction",
+   "default": "Sandbox",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "cb0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "integration_status",
+   "fieldtype": "Data",
+   "label": "Integration Status",
+   "read_only": 1,
+   "default": "Skeleton - Pending API Documentation"
+  },
+  {
+   "fieldname": "accreditation_number",
+   "fieldtype": "Data",
+   "label": "Accreditation Number",
+   "read_only": 1,
+   "default": "157529"
+  },
+  {
+   "fieldname": "sb_conn",
+   "fieldtype": "Section Break",
+   "label": "Connection and API Contract"
+  },
+  {
+   "fieldname": "asp_connection",
+   "fieldtype": "Link",
+   "label": "ASP Connection",
+   "options": "ASP Connection",
+   "description": "Created automatically on save when empty. Holds credentials and the webhook secret."
+  },
+  {
+   "fieldname": "rest_configuration",
+   "fieldtype": "Link",
+   "label": "ASP REST API Configuration",
+   "options": "ASP REST API Configuration",
+   "description": "Endpoints, authentication and mappings, filled from Microvista's official API documentation."
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "participant_tin",
+   "fieldtype": "Data",
+   "label": "Participant TIN"
+  },
+  {
+   "fieldname": "participant_id",
+   "fieldtype": "Data",
+   "label": "Microvista Participant / Taxpayer ID"
+  },
+  {
+   "fieldname": "sb_ready",
+   "fieldtype": "Section Break",
+   "label": "Readiness"
+  },
+  {
+   "fieldname": "readiness_html",
+   "fieldtype": "HTML",
+   "label": "Readiness"
+  },
+  {
+   "fieldname": "last_test_status",
+   "fieldtype": "Small Text",
+   "label": "Last Test Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_tested_on",
+   "fieldtype": "Datetime",
+   "label": "Last Tested On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_notes",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "Microvista Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Tenant Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub User",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "autoname": "MVS-.#####",
+ "naming_rule": "Expression (old style)",
+ "title_field": "settings_name"
+}

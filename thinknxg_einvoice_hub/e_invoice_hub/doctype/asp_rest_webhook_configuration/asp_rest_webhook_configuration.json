@@ -1,0 +1,129 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "webhook_enabled",
+  "webhook_endpoint",
+  "authentication_type",
+  "signing_secret",
+  "signature_header",
+  "event_identifier_path",
+  "event_type_path",
+  "document_identifier_path",
+  "status_path",
+  "payload_mapping",
+  "document_events",
+  "document_path",
+  "document_base64",
+  "retry_policy"
+ ],
+ "fields": [
+  {
+   "fieldname": "webhook_enabled",
+   "fieldtype": "Check",
+   "label": "Webhook Enabled",
+   "default": "1",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "webhook_endpoint",
+   "fieldtype": "Data",
+   "label": "Webhook Endpoint",
+   "length": 500,
+   "read_only": 1,
+   "description": "Hub URL to register with the provider; shown on the ASP Connection."
+  },
+  {
+   "fieldname": "authentication_type",
+   "fieldtype": "Select",
+   "label": "Authentication Type",
+   "options": "HMAC-SHA256\nStandard Webhooks\nShared Secret\nJWT",
+   "default": "HMAC-SHA256",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "signing_secret",
+   "fieldtype": "Password",
+   "label": "Signing Secret"
+  },
+  {
+   "fieldname": "signature_header",
+   "fieldtype": "Data",
+   "label": "Signature Header",
+   "in_list_view": 1,
+   "description": "Header carrying the signature, secret or token. Must not be Authorization."
+  },
+  {
+   "fieldname": "event_identifier_path",
+   "fieldtype": "Data",
+   "label": "Event Identifier Path",
+   "default": "id"
+  },
+  {
+   "fieldname": "event_type_path",
+   "fieldtype": "Data",
+   "label": "Event Type Path",
+   "default": "event",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "document_identifier_path",
+   "fieldtype": "Data",
+   "label": "Document Identifier Path",
+   "default": "document_id"
+  },
+  {
+   "fieldname": "status_path",
+   "fieldtype": "Data",
+   "label": "Status Path",
+   "default": "status"
+  },
+  {
+   "fieldname": "payload_mapping",
+   "fieldtype": "Code",
+   "label": "Payload Mapping (JSON)",
+   "options": "JSON",
+   "description": "Platform field -> JSON path, e.g. {\"fta_status\": \"data.reporting.status\"}"
+  },
+  {
+   "fieldname": "document_events",
+   "fieldtype": "Data",
+   "label": "Document Events",
+   "description": "Comma-separated event types that carry an incoming document."
+  },
+  {
+   "fieldname": "document_path",
+   "fieldtype": "Data",
+   "label": "Document Path",
+   "default": "document"
+  },
+  {
+   "fieldname": "document_base64",
+   "fieldtype": "Check",
+   "label": "Document is Base64"
+  },
+  {
+   "fieldname": "retry_policy",
+   "fieldtype": "Small Text",
+   "label": "Retry Policy",
+   "description": "Provider's redelivery policy, for reference."
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "ASP REST Webhook Configuration",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0,
+ "editable_grid": 1
+}

@@ -1,0 +1,251 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "asp_name",
+  "asp_code",
+  "legal_name",
+  "accreditation_number",
+  "enabled",
+  "cb0",
+  "official_website",
+  "api_documentation_url",
+  "sandbox_url",
+  "production_url",
+  "sb_status",
+  "accreditation_status",
+  "last_verification_date",
+  "cb1",
+  "integration_status",
+  "sandbox_tested",
+  "cb2",
+  "production_verified",
+  "sb_adapter",
+  "adapter_type",
+  "adapter",
+  "rest_configuration",
+  "cb3",
+  "authentication_type",
+  "supported_capabilities",
+  "sb_notes",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "asp_name",
+   "fieldtype": "Data",
+   "label": "ASP Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "asp_code",
+   "fieldtype": "Data",
+   "label": "ASP Code",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "legal_name",
+   "fieldtype": "Data",
+   "label": "Legal Name",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "accreditation_number",
+   "fieldtype": "Data",
+   "label": "Accreditation Number",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1"
+  },
+  {
+   "fieldname": "cb0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "official_website",
+   "fieldtype": "Data",
+   "label": "Official Website",
+   "length": 255
+  },
+  {
+   "fieldname": "api_documentation_url",
+   "fieldtype": "Data",
+   "label": "API Documentation URL",
+   "length": 500
+  },
+  {
+   "fieldname": "sandbox_url",
+   "fieldtype": "Data",
+   "label": "Sandbox URL",
+   "length": 500
+  },
+  {
+   "fieldname": "production_url",
+   "fieldtype": "Data",
+   "label": "Production URL",
+   "length": 500
+  },
+  {
+   "fieldname": "sb_status",
+   "fieldtype": "Section Break",
+   "label": "Three Separate Statuses"
+  },
+  {
+   "fieldname": "accreditation_status",
+   "fieldtype": "Select",
+   "label": "Accreditation Status",
+   "options": "Accredited\nPre-Approved\nNot Verified\nWithdrawn",
+   "default": "Not Verified",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "As published by the Ministry of Finance. Accreditation says nothing about whether an integration exists."
+  },
+  {
+   "fieldname": "last_verification_date",
+   "fieldtype": "Date",
+   "label": "Last Verification Date",
+   "description": "When the accreditation entry was last checked."
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "integration_status",
+   "fieldtype": "Select",
+   "label": "Integration Status",
+   "options": "Not Started\nSkeleton - Pending API Documentation\nIn Development\nSandbox Tested\nProduction Verified",
+   "default": "Not Started",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "State of the hub's own connector for this provider."
+  },
+  {
+   "fieldname": "sandbox_tested",
+   "fieldtype": "Check",
+   "label": "Sandbox Tested"
+  },
+  {
+   "fieldname": "cb2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "production_verified",
+   "fieldtype": "Check",
+   "label": "Production Verified",
+   "description": "Tick only after sandbox tests passed against the provider's real API. Production connections are refused for providers without this tick."
+  },
+  {
+   "fieldname": "sb_adapter",
+   "fieldtype": "Section Break",
+   "label": "Integration"
+  },
+  {
+   "fieldname": "adapter_type",
+   "fieldtype": "Select",
+   "label": "Adapter Type",
+   "options": "None\nDedicated Adapter\nGeneric REST",
+   "default": "None"
+  },
+  {
+   "fieldname": "adapter",
+   "fieldtype": "Link",
+   "label": "Adapter",
+   "options": "ASP Provider"
+  },
+  {
+   "fieldname": "rest_configuration",
+   "fieldtype": "Link",
+   "label": "REST Configuration Template",
+   "options": "ASP REST API Configuration"
+  },
+  {
+   "fieldname": "cb3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "authentication_type",
+   "fieldtype": "Data",
+   "label": "Authentication Type"
+  },
+  {
+   "fieldname": "supported_capabilities",
+   "fieldtype": "Small Text",
+   "label": "Supported Capabilities",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_notes",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "UAE Accredited Service Provider",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Tenant Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  },
+  {
+   "role": "E-Invoice Hub User",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "autoname": "field:asp_code",
+ "naming_rule": "By fieldname",
+ "title_field": "asp_name"
+}

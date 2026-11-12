@@ -1,0 +1,327 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "connection_name",
+  "tenant",
+  "erp_connector",
+  "cb0",
+  "enabled",
+  "environment",
+  "sync_direction",
+  "mapping_configuration",
+  "sb_auth",
+  "base_url",
+  "auth_type",
+  "verify_ssl",
+  "timeout",
+  "cb_auth",
+  "api_key",
+  "api_secret",
+  "username",
+  "password",
+  "token_url",
+  "client_id",
+  "client_secret",
+  "scope",
+  "sb_webhook",
+  "webhook_secret",
+  "webhook_help",
+  "sb_extra",
+  "extra_config",
+  "sb_poll",
+  "polling_enabled",
+  "polling_filters",
+  "cb_poll",
+  "last_polled_on",
+  "sb_test",
+  "last_test_status",
+  "cb_test",
+  "last_tested_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "connection_name",
+   "fieldtype": "Data",
+   "label": "Connection Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "label": "Tenant",
+   "options": "Integration Tenant",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "erp_connector",
+   "fieldtype": "Link",
+   "label": "ERP Connector",
+   "options": "ERP Connector",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "cb0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "environment",
+   "fieldtype": "Select",
+   "label": "Environment",
+   "options": "Sandbox\nProduction",
+   "default": "Production"
+  },
+  {
+   "fieldname": "sync_direction",
+   "fieldtype": "Select",
+   "label": "Synchronisation Direction",
+   "options": "Push (ERP sends to hub)\nPull (hub retrieves from ERP)\nBoth",
+   "default": "Both"
+  },
+  {
+   "fieldname": "mapping_configuration",
+   "fieldtype": "Link",
+   "label": "Mapping Configuration",
+   "options": "Mapping Configuration",
+   "description": "Optional field mapping from this ERP's payload to the canonical invoice."
+  },
+  {
+   "fieldname": "sb_auth",
+   "fieldtype": "Section Break",
+   "label": "Endpoint and Authentication"
+  },
+  {
+   "fieldname": "base_url",
+   "fieldtype": "Data",
+   "label": "Base URL",
+   "length": 500
+  },
+  {
+   "fieldname": "auth_type",
+   "fieldtype": "Select",
+   "label": "Auth Type",
+   "options": "None\nAPI Key and Secret\nBasic\nBearer Token\nOAuth2 Client Credentials",
+   "default": "API Key and Secret"
+  },
+  {
+   "fieldname": "verify_ssl",
+   "fieldtype": "Check",
+   "label": "Verify SSL Certificate",
+   "default": "1"
+  },
+  {
+   "fieldname": "timeout",
+   "fieldtype": "Int",
+   "label": "Timeout (seconds)",
+   "default": "30"
+  },
+  {
+   "fieldname": "cb_auth",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Data",
+   "label": "API Key",
+   "depends_on": "eval:doc.auth_type=='API Key and Secret'"
+  },
+  {
+   "fieldname": "api_secret",
+   "fieldtype": "Password",
+   "label": "API Secret / Token",
+   "depends_on": "eval:['API Key and Secret','Bearer Token'].includes(doc.auth_type)"
+  },
+  {
+   "fieldname": "username",
+   "fieldtype": "Data",
+   "label": "Username",
+   "depends_on": "eval:doc.auth_type=='Basic'"
+  },
+  {
+   "fieldname": "password",
+   "fieldtype": "Password",
+   "label": "Password",
+   "depends_on": "eval:doc.auth_type=='Basic'"
+  },
+  {
+   "fieldname": "token_url",
+   "fieldtype": "Data",
+   "label": "Token URL",
+   "length": 500,
+   "depends_on": "eval:doc.auth_type=='OAuth2 Client Credentials'"
+  },
+  {
+   "fieldname": "client_id",
+   "fieldtype": "Data",
+   "label": "Client ID",
+   "depends_on": "eval:doc.auth_type=='OAuth2 Client Credentials'"
+  },
+  {
+   "fieldname": "client_secret",
+   "fieldtype": "Password",
+   "label": "Client Secret",
+   "depends_on": "eval:doc.auth_type=='OAuth2 Client Credentials'"
+  },
+  {
+   "fieldname": "scope",
+   "fieldtype": "Data",
+   "label": "Scope",
+   "depends_on": "eval:doc.auth_type=='OAuth2 Client Credentials'"
+  },
+  {
+   "fieldname": "sb_webhook",
+   "fieldtype": "Section Break",
+   "label": "Webhooks"
+  },
+  {
+   "fieldname": "webhook_secret",
+   "fieldtype": "Password",
+   "label": "Webhook Secret",
+   "description": "Shared secret used to verify the HMAC-SHA256 signature of incoming webhooks. Webhooks are rejected while this is empty."
+  },
+  {
+   "fieldname": "webhook_help",
+   "fieldtype": "HTML",
+   "label": "Webhook URL"
+  },
+  {
+   "fieldname": "sb_extra",
+   "fieldtype": "Section Break",
+   "label": "Advanced Configuration"
+  },
+  {
+   "fieldname": "extra_config",
+   "fieldtype": "Code",
+   "label": "Extra Configuration (JSON)",
+   "options": "JSON",
+   "description": "Connector-specific settings for this ERP connection. See the app README."
+  },
+  {
+   "fieldname": "sb_poll",
+   "fieldtype": "Section Break",
+   "label": "Scheduled Retrieval"
+  },
+  {
+   "fieldname": "polling_enabled",
+   "fieldtype": "Check",
+   "label": "Retrieve Pending Invoices Automatically"
+  },
+  {
+   "fieldname": "polling_filters",
+   "fieldtype": "Code",
+   "label": "Retrieval Filters (JSON)",
+   "options": "JSON",
+   "depends_on": "polling_enabled"
+  },
+  {
+   "fieldname": "cb_poll",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_polled_on",
+   "fieldtype": "Datetime",
+   "label": "Last Polled On",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "sb_test",
+   "fieldtype": "Section Break",
+   "label": "Connection Test"
+  },
+  {
+   "fieldname": "last_test_status",
+   "fieldtype": "Data",
+   "label": "Connection Status",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "cb_test",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_tested_on",
+   "fieldtype": "Datetime",
+   "label": "Last Tested On",
+   "read_only": 1,
+   "no_copy": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "ERP Connection",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Tenant Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub User",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "autoname": "ERPC-.#####",
+ "naming_rule": "Expression (old style)",
+ "title_field": "connection_name"
+}

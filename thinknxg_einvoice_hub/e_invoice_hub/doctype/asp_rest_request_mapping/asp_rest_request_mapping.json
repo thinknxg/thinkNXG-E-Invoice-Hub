@@ -1,0 +1,97 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "operation",
+  "source_field",
+  "target_json_path",
+  "data_type",
+  "transformation",
+  "condition",
+  "required",
+  "default_value",
+  "enabled"
+ ],
+ "fields": [
+  {
+   "fieldname": "operation",
+   "fieldtype": "Select",
+   "label": "Operation",
+   "options": "Authenticate\nVerify Credentials\nGet Participant\nRegister Participant\nValidate Invoice\nSubmit Invoice\nSubmit Credit Note\nSubmit Self-Billed Invoice\nGet Invoice Status\nGet Reporting Status\nGet Delivery Status\nDownload XML\nDownload PDF\nGet Incoming Invoices\nRegister Webhook\nGet Webhook Subscription\nCustom Operation",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "source_field",
+   "fieldtype": "Data",
+   "label": "Source Field",
+   "length": 255,
+   "in_list_view": 1,
+   "description": "e.g. invoice.document.invoice_number, invoice.lines[].quantity, document, document_base64, $now"
+  },
+  {
+   "fieldname": "target_json_path",
+   "fieldtype": "Data",
+   "label": "Target JSON Path",
+   "reqd": 1,
+   "length": 255,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "data_type",
+   "fieldtype": "Select",
+   "label": "Data Type",
+   "options": "String\nInteger\nDecimal\nBoolean\nDate\nDateTime\nJSON",
+   "default": "String",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "transformation",
+   "fieldtype": "Data",
+   "label": "Transformation",
+   "length": 500,
+   "in_list_view": 1,
+   "description": "Whitelisted steps joined by |, e.g. upper, date:%d/%m/%Y, decimal:2, map:{\"a\":\"b\"}, const:x"
+  },
+  {
+   "fieldname": "condition",
+   "fieldtype": "Data",
+   "label": "Condition",
+   "length": 255,
+   "description": "Optional, e.g. invoice.document.document_type == CREDIT_NOTE"
+  },
+  {
+   "fieldname": "required",
+   "fieldtype": "Check",
+   "label": "Required"
+  },
+  {
+   "fieldname": "default_value",
+   "fieldtype": "Data",
+   "label": "Default Value"
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "ASP REST Request Mapping",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0,
+ "editable_grid": 1
+}

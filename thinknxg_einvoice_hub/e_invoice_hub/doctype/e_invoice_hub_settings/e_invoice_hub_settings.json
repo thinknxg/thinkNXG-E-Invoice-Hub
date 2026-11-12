@@ -1,0 +1,122 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sb_retry",
+  "max_retries",
+  "retry_base_minutes",
+  "cb0",
+  "poll_batch_size",
+  "status_sync_batch",
+  "sb_sec",
+  "allow_private_hosts",
+  "sb_logs",
+  "log_retention_days",
+  "allow_insecure_http"
+ ],
+ "fields": [
+  {
+   "fieldname": "sb_retry",
+   "fieldtype": "Section Break",
+   "label": "Retry Engine"
+  },
+  {
+   "fieldname": "max_retries",
+   "fieldtype": "Int",
+   "label": "Max Retries",
+   "default": "6"
+  },
+  {
+   "fieldname": "retry_base_minutes",
+   "fieldtype": "Int",
+   "label": "First Retry Delay (minutes)",
+   "default": "5",
+   "description": "Delay doubles after every failed attempt."
+  },
+  {
+   "fieldname": "cb0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "poll_batch_size",
+   "fieldtype": "Int",
+   "label": "ERP Retrieval Batch Size",
+   "default": "50"
+  },
+  {
+   "fieldname": "status_sync_batch",
+   "fieldtype": "Int",
+   "label": "ASP Status Sync Batch Size",
+   "default": "100"
+  },
+  {
+   "fieldname": "sb_sec",
+   "fieldtype": "Section Break",
+   "label": "Security"
+  },
+  {
+   "fieldname": "allow_private_hosts",
+   "fieldtype": "Check",
+   "label": "Allow Connections to Private Network Hosts",
+   "description": "Enable only for single-organisation deployments where the ERP runs on the local network. Keep disabled on shared multi-tenant deployments."
+  },
+  {
+   "fieldname": "sb_logs",
+   "fieldtype": "Section Break",
+   "label": "Integration Logs"
+  },
+  {
+   "fieldname": "log_retention_days",
+   "fieldtype": "Int",
+   "label": "Keep Integration Logs (days)",
+   "default": "90"
+  },
+  {
+   "fieldname": "allow_insecure_http",
+   "fieldtype": "Check",
+   "label": "Allow Plain HTTP Endpoints",
+   "description": "For local test servers only. Keep disabled in production: ASP endpoints must use HTTPS."
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 1,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "E-Invoice Hub Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,0 +1,143 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "config_name",
+  "tenant",
+  "erp_connector",
+  "cb0",
+  "enabled",
+  "line_source_path",
+  "sb_rules",
+  "rules",
+  "sb_defaults",
+  "defaults"
+ ],
+ "fields": [
+  {
+   "fieldname": "config_name",
+   "fieldtype": "Data",
+   "label": "Mapping Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "label": "Tenant",
+   "options": "Integration Tenant",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "Leave empty to make this a shared template (hub administrators only)."
+  },
+  {
+   "fieldname": "erp_connector",
+   "fieldtype": "Link",
+   "label": "ERP Connector",
+   "options": "ERP Connector",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "cb0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1"
+  },
+  {
+   "fieldname": "line_source_path",
+   "fieldtype": "Data",
+   "label": "Source Path of Invoice Lines",
+   "description": "Path of the line array in the ERP payload, e.g. items or d.results"
+  },
+  {
+   "fieldname": "sb_rules",
+   "fieldtype": "Section Break",
+   "label": "Field Mapping"
+  },
+  {
+   "fieldname": "rules",
+   "fieldtype": "Table",
+   "label": "Mapping Rules",
+   "options": "Mapping Rule"
+  },
+  {
+   "fieldname": "sb_defaults",
+   "fieldtype": "Section Break",
+   "label": "Static Defaults"
+  },
+  {
+   "fieldname": "defaults",
+   "fieldtype": "Code",
+   "label": "Canonical Defaults (JSON)",
+   "options": "JSON",
+   "description": "Canonical values applied before the mapping rules, e.g. {\"document\": {\"currency\": \"AED\"}}"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "Mapping Configuration",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Tenant Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub User",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "autoname": "MAP-.#####",
+ "naming_rule": "Expression (old style)",
+ "title_field": "config_name"
+}

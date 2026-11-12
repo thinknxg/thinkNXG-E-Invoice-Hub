@@ -1,0 +1,669 @@
+{
+ "_source": "Built from Wafeq's public documentation (https://wafeq-e-invoicing-asp.readme.io/docs, read 2026-11-12). NOT sandbox-tested: field values such as tax_category have not been confirmed against the live API. Verify in the Wafeq sandbox before any real use.",
+ "asp_name": "Wafeq (preset from public documentation)",
+ "asp_code": "wafeq",
+ "accreditation_number": "129932",
+ "integration_type": "REST JSON",
+ "api_version": "v1",
+ "environment": "Sandbox",
+ "api_documentation_url": "https://wafeq-e-invoicing-asp.readme.io/docs/getting-started",
+ "sandbox_base_url": "https://api.wafeq.com/ae/v1",
+ "production_base_url": "https://api.wafeq.com/ae/v1",
+ "verify_ssl": 1,
+ "max_response_mb": 10,
+ "authentication_type": "API Key",
+ "api_key_header": "Authorization",
+ "api_key_prefix": "Api-Key ",
+ "description": "Preset from public documentation; not sandbox-tested. One base URL serves both modes: the API key (pk_test_ / pk_live_) selects sandbox or live. Put the taxpayer ID (txpay_...) in 'Participant / Taxpayer ID' on the ASP Connection. Wafeq builds the e-invoice itself from JSON; seller, totals and document type are not sent.",
+ "headers": [
+  {
+   "header_name": "x-ae-taxpayer-id",
+   "value_type": "Dynamic",
+   "dynamic_value": "participant.participant_id",
+   "enabled": 1
+  }
+ ],
+ "endpoints": [
+  {
+   "endpoint_name": "Submit invoice",
+   "operation": "Submit Invoice",
+   "http_method": "POST",
+   "relative_url": "/invoices",
+   "authentication_required": 1,
+   "timeout": 60,
+   "retry_enabled": 1,
+   "maximum_retries": 2,
+   "idempotency_enabled": 1,
+   "idempotency_header": "Idempotency-Key",
+   "enabled": 1
+  },
+  {
+   "endpoint_name": "Submit credit note",
+   "operation": "Submit Credit Note",
+   "http_method": "POST",
+   "relative_url": "/credit-notes",
+   "authentication_required": 1,
+   "timeout": 60,
+   "retry_enabled": 1,
+   "maximum_retries": 2,
+   "idempotency_enabled": 1,
+   "idempotency_header": "Idempotency-Key",
+   "enabled": 1
+  },
+  {
+   "endpoint_name": "Validate invoice",
+   "operation": "Validate Invoice",
+   "http_method": "POST",
+   "relative_url": "/invoices/validate",
+   "authentication_required": 1,
+   "timeout": 30,
+   "enabled": 1
+  },
+  {
+   "endpoint_name": "Get invoice",
+   "operation": "Get Invoice Status",
+   "http_method": "GET",
+   "relative_url": "/invoices/{document_id}",
+   "authentication_required": 1,
+   "timeout": 30,
+   "retry_enabled": 1,
+   "maximum_retries": 2,
+   "enabled": 1
+  }
+ ],
+ "request_mappings": [
+  {
+   "source_field": "invoice.document.invoice_number",
+   "target_json_path": "invoice_number",
+   "required": 1,
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.invoice_date",
+   "target_json_path": "issue_date",
+   "data_type": "Date",
+   "required": 1,
+   "operation": "Submit Invoice",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.document.due_date",
+   "target_json_path": "due_date",
+   "data_type": "Date",
+   "operation": "Submit Invoice",
+   "enabled": 1
+  },
+  {
+   "source_field": "metadata.transaction",
+   "target_json_path": "source_id",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.currency",
+   "target_json_path": "currency",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.exchange_rate",
+   "target_json_path": "currency_exchange_rate",
+   "data_type": "Decimal",
+   "condition": "invoice.document.currency != AED",
+   "operation": "Submit Invoice",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.document.transaction_type_flags",
+   "target_json_path": "transaction_type_code",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.notes",
+   "target_json_path": "notes",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "metadata.receiver_id",
+   "target_json_path": "customer.id",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.legal_name",
+   "target_json_path": "customer.name",
+   "required": 1,
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.tax_id",
+   "target_json_path": "customer.vat_number",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.legal_registration_type",
+   "target_json_path": "customer.legal_registration.type",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.legal_registration_id",
+   "target_json_path": "customer.legal_registration.id",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.address.street",
+   "target_json_path": "customer.address.street",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.address.city",
+   "target_json_path": "customer.address.city",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.address.country",
+   "target_json_path": "customer.address.country",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.address.subdivision",
+   "target_json_path": "customer.address.country_subentity",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.lines[].item_name",
+   "target_json_path": "line_items[].description",
+   "required": 1,
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.lines[].quantity",
+   "target_json_path": "line_items[].quantity",
+   "data_type": "Decimal",
+   "required": 1,
+   "operation": "Submit Invoice",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.lines[].unit_price",
+   "target_json_path": "line_items[].unit_price",
+   "data_type": "Decimal",
+   "required": 1,
+   "operation": "Submit Invoice",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.lines[].tax_category",
+   "target_json_path": "line_items[].tax_category",
+   "transformation": "uae_tax_code",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.lines[].tax_rate",
+   "target_json_path": "line_items[].tax_percent",
+   "data_type": "Decimal",
+   "operation": "Submit Invoice",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.lines[].exemption_reason_code",
+   "target_json_path": "line_items[].tax_exemption_reason_code",
+   "operation": "Submit Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.invoice_number",
+   "target_json_path": "invoice_number",
+   "required": 1,
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.invoice_date",
+   "target_json_path": "issue_date",
+   "data_type": "Date",
+   "required": 1,
+   "operation": "Submit Credit Note",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.document.due_date",
+   "target_json_path": "due_date",
+   "data_type": "Date",
+   "operation": "Submit Credit Note",
+   "enabled": 1
+  },
+  {
+   "source_field": "metadata.transaction",
+   "target_json_path": "source_id",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.currency",
+   "target_json_path": "currency",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.exchange_rate",
+   "target_json_path": "currency_exchange_rate",
+   "data_type": "Decimal",
+   "condition": "invoice.document.currency != AED",
+   "operation": "Submit Credit Note",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.document.transaction_type_flags",
+   "target_json_path": "transaction_type_code",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.notes",
+   "target_json_path": "notes",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "metadata.receiver_id",
+   "target_json_path": "customer.id",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.legal_name",
+   "target_json_path": "customer.name",
+   "required": 1,
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.tax_id",
+   "target_json_path": "customer.vat_number",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.legal_registration_type",
+   "target_json_path": "customer.legal_registration.type",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.legal_registration_id",
+   "target_json_path": "customer.legal_registration.id",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.address.street",
+   "target_json_path": "customer.address.street",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.address.city",
+   "target_json_path": "customer.address.city",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.address.country",
+   "target_json_path": "customer.address.country",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.address.subdivision",
+   "target_json_path": "customer.address.country_subentity",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.lines[].item_name",
+   "target_json_path": "line_items[].description",
+   "required": 1,
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.lines[].quantity",
+   "target_json_path": "line_items[].quantity",
+   "data_type": "Decimal",
+   "required": 1,
+   "operation": "Submit Credit Note",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.lines[].unit_price",
+   "target_json_path": "line_items[].unit_price",
+   "data_type": "Decimal",
+   "required": 1,
+   "operation": "Submit Credit Note",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.lines[].tax_category",
+   "target_json_path": "line_items[].tax_category",
+   "transformation": "uae_tax_code",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.lines[].tax_rate",
+   "target_json_path": "line_items[].tax_percent",
+   "data_type": "Decimal",
+   "operation": "Submit Credit Note",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.lines[].exemption_reason_code",
+   "target_json_path": "line_items[].tax_exemption_reason_code",
+   "operation": "Submit Credit Note",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.invoice_number",
+   "target_json_path": "invoice_number",
+   "required": 1,
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.invoice_date",
+   "target_json_path": "issue_date",
+   "data_type": "Date",
+   "required": 1,
+   "operation": "Validate Invoice",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.document.due_date",
+   "target_json_path": "due_date",
+   "data_type": "Date",
+   "operation": "Validate Invoice",
+   "enabled": 1
+  },
+  {
+   "source_field": "metadata.transaction",
+   "target_json_path": "source_id",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.currency",
+   "target_json_path": "currency",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.exchange_rate",
+   "target_json_path": "currency_exchange_rate",
+   "data_type": "Decimal",
+   "condition": "invoice.document.currency != AED",
+   "operation": "Validate Invoice",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.document.transaction_type_flags",
+   "target_json_path": "transaction_type_code",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.document.notes",
+   "target_json_path": "notes",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "metadata.receiver_id",
+   "target_json_path": "customer.id",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.legal_name",
+   "target_json_path": "customer.name",
+   "required": 1,
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.tax_id",
+   "target_json_path": "customer.vat_number",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.legal_registration_type",
+   "target_json_path": "customer.legal_registration.type",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.legal_registration_id",
+   "target_json_path": "customer.legal_registration.id",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.address.street",
+   "target_json_path": "customer.address.street",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.address.city",
+   "target_json_path": "customer.address.city",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.address.country",
+   "target_json_path": "customer.address.country",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.customer.address.subdivision",
+   "target_json_path": "customer.address.country_subentity",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.lines[].item_name",
+   "target_json_path": "line_items[].description",
+   "required": 1,
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.lines[].quantity",
+   "target_json_path": "line_items[].quantity",
+   "data_type": "Decimal",
+   "required": 1,
+   "operation": "Validate Invoice",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.lines[].unit_price",
+   "target_json_path": "line_items[].unit_price",
+   "data_type": "Decimal",
+   "required": 1,
+   "operation": "Validate Invoice",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.lines[].tax_category",
+   "target_json_path": "line_items[].tax_category",
+   "transformation": "uae_tax_code",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  },
+  {
+   "source_field": "invoice.lines[].tax_rate",
+   "target_json_path": "line_items[].tax_percent",
+   "data_type": "Decimal",
+   "operation": "Validate Invoice",
+   "enabled": 1
+  },
+  {
+   "source_field": "invoice.lines[].exemption_reason_code",
+   "target_json_path": "line_items[].tax_exemption_reason_code",
+   "operation": "Validate Invoice",
+   "enabled": 1,
+   "data_type": "String"
+  }
+ ],
+ "response_mappings": [
+  {
+   "response_json_path": "document_id",
+   "target_platform_field": "asp_document_id",
+   "enabled": 1
+  },
+  {
+   "operation": "Get Invoice Status",
+   "response_json_path": "id",
+   "target_platform_field": "asp_document_id",
+   "enabled": 1
+  },
+  {
+   "operation": "Submit Invoice",
+   "response_json_path": "status",
+   "target_platform_field": "submission_status",
+   "transformation": "map:{\"queued\": \"ACCEPTED\", \"reporting_only\": \"ACCEPTED\", \"delivered\": \"ACCEPTED\", \"failed\": \"ACCEPTED\", \"*\": \"REJECTED\"}",
+   "enabled": 1
+  },
+  {
+   "operation": "Submit Credit Note",
+   "response_json_path": "status",
+   "target_platform_field": "submission_status",
+   "transformation": "map:{\"queued\": \"ACCEPTED\", \"reporting_only\": \"ACCEPTED\", \"delivered\": \"ACCEPTED\", \"failed\": \"ACCEPTED\", \"*\": \"REJECTED\"}",
+   "enabled": 1
+  },
+  {
+   "operation": "Submit Invoice",
+   "response_json_path": "status",
+   "target_platform_field": "delivery_status",
+   "transformation": "map:{\"queued\": \"PENDING\", \"delivered\": \"DELIVERED\", \"failed\": \"FAILED\", \"*\": \"\"}",
+   "enabled": 1
+  },
+  {
+   "operation": "Submit Credit Note",
+   "response_json_path": "status",
+   "target_platform_field": "delivery_status",
+   "transformation": "map:{\"queued\": \"PENDING\", \"delivered\": \"DELIVERED\", \"failed\": \"FAILED\", \"*\": \"\"}",
+   "enabled": 1
+  },
+  {
+   "operation": "Get Invoice Status",
+   "response_json_path": "tdd_status",
+   "target_platform_field": "fta_status",
+   "transformation": "map:{\"reporting\": \"PENDING\", \"reported\": \"REPORTED\", \"rejected\": \"REJECTED\", \"withdrawn\": \"REJECTED\", \"unresolved\": \"PENDING\", \"not_reported\": \"\"}",
+   "enabled": 1
+  },
+  {
+   "operation": "Get Invoice Status",
+   "response_json_path": "delivery_status",
+   "target_platform_field": "delivery_status",
+   "transformation": "map:{\"queued\": \"PENDING\", \"sending\": \"PENDING\", \"retrying\": \"PENDING\", \"sent\": \"PENDING\", \"received_by_ap\": \"PENDING\", \"forwarded\": \"PENDING\", \"delivered_confirmed\": \"DELIVERED\", \"rejected\": \"FAILED\", \"failed\": \"FAILED\", \"attention_required\": \"FAILED\", \"not_applicable\": \"\"}",
+   "enabled": 1
+  },
+  {
+   "response_json_path": "error",
+   "target_platform_field": "error_message",
+   "enabled": 1
+  },
+  {
+   "operation": "Validate Invoice",
+   "response_json_path": "valid",
+   "target_platform_field": "success",
+   "enabled": 1
+  },
+  {
+   "operation": "Validate Invoice",
+   "response_json_path": "errors",
+   "target_platform_field": "error_message",
+   "enabled": 1
+  }
+ ],
+ "webhooks": [
+  {
+   "webhook_enabled": 1,
+   "authentication_type": "Standard Webhooks",
+   "event_identifier_path": "id",
+   "event_type_path": "type",
+   "document_identifier_path": "data.document_id",
+   "status_path": "data.status",
+   "payload_mapping": "{\"fta_status\": \"data.tax_authority_status\", \"delivery_status\": \"data.delivery_status\"}",
+   "document_events": "document.received",
+   "document_path": "data",
+   "retry_policy": "At least once, possibly out of order, exponential backoff (per Wafeq documentation)"
+  }
+ ]
+}

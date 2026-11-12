@@ -1,0 +1,268 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "company_name",
+  "trading_name",
+  "tenant",
+  "enabled",
+  "cb0",
+  "tax_id",
+  "tin",
+  "participant_id",
+  "legal_registration_id",
+  "legal_registration_type",
+  "sb_addr",
+  "street",
+  "additional_street",
+  "city",
+  "cb_addr",
+  "subdivision",
+  "postal_code",
+  "country",
+  "country_code",
+  "sb_route",
+  "erp_connection",
+  "asp_connection",
+  "accredited_provider",
+  "compliance_profile",
+  "cb_route",
+  "auto_submit",
+  "sync_status_to_erp",
+  "inbound_action"
+ ],
+ "fields": [
+  {
+   "fieldname": "company_name",
+   "fieldtype": "Data",
+   "label": "Legal Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "trading_name",
+   "fieldtype": "Data",
+   "label": "Trading Name"
+  },
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "label": "Tenant",
+   "options": "Integration Tenant",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "cb0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tax_id",
+   "fieldtype": "Data",
+   "label": "Tax Registration Number (TRN)",
+   "reqd": 1,
+   "in_list_view": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "tin",
+   "fieldtype": "Data",
+   "label": "Tax Identification Number (TIN)",
+   "description": "Network participant identifier. For the UAE this is derived from the first 10 digits of the TRN when left empty."
+  },
+  {
+   "fieldname": "participant_id",
+   "fieldtype": "Data",
+   "label": "Network Participant ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "legal_registration_id",
+   "fieldtype": "Data",
+   "label": "Legal Registration ID"
+  },
+  {
+   "fieldname": "legal_registration_type",
+   "fieldtype": "Select",
+   "label": "Legal Registration Type",
+   "options": "\nTL\nEID\nPAS\nCD",
+   "description": "TL = Trade Licence, EID = Emirates ID, PAS = Passport, CD = Cabinet Decision"
+  },
+  {
+   "fieldname": "sb_addr",
+   "fieldtype": "Section Break",
+   "label": "Registered Address"
+  },
+  {
+   "fieldname": "street",
+   "fieldtype": "Data",
+   "label": "Street"
+  },
+  {
+   "fieldname": "additional_street",
+   "fieldtype": "Data",
+   "label": "Additional Street"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "cb_addr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "subdivision",
+   "fieldtype": "Data",
+   "label": "Emirate / State Code",
+   "description": "e.g. AUH, DXB, SHJ, AJM, UAQ, RAK, FUJ"
+  },
+  {
+   "fieldname": "postal_code",
+   "fieldtype": "Data",
+   "label": "Postal Code"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country"
+  },
+  {
+   "fieldname": "country_code",
+   "fieldtype": "Data",
+   "label": "Country Code (ISO 3166-1)",
+   "length": 2,
+   "default": "AE",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sb_route",
+   "fieldtype": "Section Break",
+   "label": "Routing"
+  },
+  {
+   "fieldname": "erp_connection",
+   "fieldtype": "Link",
+   "label": "ERP Connection",
+   "options": "ERP Connection"
+  },
+  {
+   "fieldname": "asp_connection",
+   "fieldtype": "Link",
+   "label": "ASP Connection",
+   "options": "ASP Connection"
+  },
+  {
+   "fieldname": "accredited_provider",
+   "fieldtype": "Link",
+   "label": "Accredited Service Provider",
+   "options": "UAE Accredited Service Provider",
+   "fetch_from": "asp_connection.accredited_provider",
+   "read_only": 1
+  },
+  {
+   "fieldname": "compliance_profile",
+   "fieldtype": "Link",
+   "label": "Compliance Profile",
+   "options": "Compliance Profile",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cb_route",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "auto_submit",
+   "fieldtype": "Check",
+   "label": "Submit to ASP Automatically",
+   "default": "1"
+  },
+  {
+   "fieldname": "sync_status_to_erp",
+   "fieldtype": "Check",
+   "label": "Send Status Back to ERP",
+   "default": "1"
+  },
+  {
+   "fieldname": "inbound_action",
+   "fieldtype": "Select",
+   "label": "Inbound Invoice Action",
+   "options": "Create Draft Purchase Invoice\nHold in Hub",
+   "default": "Create Draft Purchase Invoice"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "Company Integration Profile",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Tenant Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub User",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "autoname": "CIP-.#####",
+ "naming_rule": "Expression (old style)",
+ "title_field": "company_name"
+}

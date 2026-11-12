@@ -1,0 +1,66 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "header_name",
+  "header_value",
+  "value_type",
+  "dynamic_value",
+  "enabled"
+ ],
+ "fields": [
+  {
+   "fieldname": "header_name",
+   "fieldtype": "Data",
+   "label": "Header Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "header_value",
+   "fieldtype": "Data",
+   "label": "Header Value",
+   "length": 500,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "value_type",
+   "fieldtype": "Select",
+   "label": "Value Type",
+   "options": "Static\nDynamic",
+   "default": "Static",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "dynamic_value",
+   "fieldtype": "Data",
+   "label": "Dynamic Value",
+   "in_list_view": 1,
+   "description": "now, today, timestamp, uuid, idempotency_key, environment, participant.participant_id, metadata.invoice_number ..."
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1",
+   "in_list_view": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "ASP REST Header",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0,
+ "editable_grid": 1
+}

@@ -1,0 +1,170 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "connector_name",
+  "connector_code",
+  "status",
+  "cb1",
+  "integration_methods",
+  "connector_class",
+  "sb_cap",
+  "supports_fetch_invoice",
+  "supports_fetch_pending",
+  "supports_webhooks",
+  "cb2",
+  "supports_purchase_invoice",
+  "supports_status_update",
+  "sb_desc",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "connector_name",
+   "fieldtype": "Data",
+   "label": "Connector Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "connector_code",
+   "fieldtype": "Data",
+   "label": "Connector Code",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Available\nBeta\nPlanned",
+   "default": "Planned",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "integration_methods",
+   "fieldtype": "Small Text",
+   "label": "Integration Methods"
+  },
+  {
+   "fieldname": "connector_class",
+   "fieldtype": "Data",
+   "label": "Connector Class",
+   "read_only": 1,
+   "length": 255,
+   "description": "Resolved from the connector registry; informational."
+  },
+  {
+   "fieldname": "sb_cap",
+   "fieldtype": "Section Break",
+   "label": "Advertised Capabilities"
+  },
+  {
+   "fieldname": "supports_fetch_invoice",
+   "fieldtype": "Check",
+   "label": "Supports Fetch Invoice",
+   "read_only": 1
+  },
+  {
+   "fieldname": "supports_fetch_pending",
+   "fieldtype": "Check",
+   "label": "Supports Fetch Pending Invoices",
+   "read_only": 1
+  },
+  {
+   "fieldname": "supports_webhooks",
+   "fieldtype": "Check",
+   "label": "Supports Webhooks",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "supports_purchase_invoice",
+   "fieldtype": "Check",
+   "label": "Supports Purchase Invoice Creation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "supports_status_update",
+   "fieldtype": "Check",
+   "label": "Supports Status Update",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_desc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "ERP Connector",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Tenant Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  },
+  {
+   "role": "E-Invoice Hub User",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "autoname": "field:connector_code",
+ "naming_rule": "By fieldname",
+ "title_field": "connector_name"
+}

@@ -1,0 +1,176 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "profile_name",
+  "profile_code",
+  "country",
+  "enabled",
+  "cb1",
+  "standard",
+  "spec_version",
+  "engine_code",
+  "default_currency",
+  "sb_ids",
+  "customization_id",
+  "profile_id",
+  "cb2",
+  "selfbilling_customization_id",
+  "selfbilling_profile_id",
+  "endpoint_scheme"
+ ],
+ "fields": [
+  {
+   "fieldname": "profile_name",
+   "fieldtype": "Data",
+   "label": "Profile Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "profile_code",
+   "fieldtype": "Data",
+   "label": "Profile Code",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1"
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "standard",
+   "fieldtype": "Data",
+   "label": "Standard",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "spec_version",
+   "fieldtype": "Data",
+   "label": "Specification Version"
+  },
+  {
+   "fieldname": "engine_code",
+   "fieldtype": "Data",
+   "label": "Engine Code",
+   "reqd": 1,
+   "description": "Compliance engine registered in the app, e.g. uae_pint_ae"
+  },
+  {
+   "fieldname": "default_currency",
+   "fieldtype": "Data",
+   "label": "Default Currency",
+   "length": 3
+  },
+  {
+   "fieldname": "sb_ids",
+   "fieldtype": "Section Break",
+   "label": "Specification Identifiers"
+  },
+  {
+   "fieldname": "customization_id",
+   "fieldtype": "Data",
+   "label": "Customization ID",
+   "length": 255
+  },
+  {
+   "fieldname": "profile_id",
+   "fieldtype": "Data",
+   "label": "Profile ID",
+   "length": 255
+  },
+  {
+   "fieldname": "cb2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "selfbilling_customization_id",
+   "fieldtype": "Data",
+   "label": "Self-Billing Customization ID",
+   "length": 255
+  },
+  {
+   "fieldname": "selfbilling_profile_id",
+   "fieldtype": "Data",
+   "label": "Self-Billing Profile ID",
+   "length": 255
+  },
+  {
+   "fieldname": "endpoint_scheme",
+   "fieldtype": "Data",
+   "label": "Participant Identifier Scheme"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 0,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "Compliance Profile",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "share": 1
+  },
+  {
+   "role": "E-Invoice Hub Tenant Admin",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  },
+  {
+   "role": "E-Invoice Hub User",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "autoname": "field:profile_code",
+ "naming_rule": "By fieldname",
+ "title_field": "profile_name"
+}

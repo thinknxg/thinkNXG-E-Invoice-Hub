@@ -1,0 +1,24 @@
+{
+ "content": null,
+ "creation": "2026-11-12 12:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "einvoice-hub-dashboard",
+ "owner": "Administrator",
+ "page_name": "einvoice-hub-dashboard",
+ "roles": [
+  {"role": "System Manager"},
+  {"role": "E-Invoice Hub Admin"},
+  {"role": "E-Invoice Hub Tenant Admin"},
+  {"role": "E-Invoice Hub User"}
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Universal Integration Dashboard"
+}

@@ -1,0 +1,127 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "endpoint_name",
+  "operation",
+  "http_method",
+  "relative_url",
+  "enabled",
+  "request_content_type",
+  "response_content_type",
+  "authentication_required",
+  "timeout",
+  "retry_enabled",
+  "maximum_retries",
+  "idempotency_enabled",
+  "idempotency_header",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "endpoint_name",
+   "fieldtype": "Data",
+   "label": "Endpoint Name",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "operation",
+   "fieldtype": "Select",
+   "label": "Operation",
+   "options": "Authenticate\nVerify Credentials\nGet Participant\nRegister Participant\nValidate Invoice\nSubmit Invoice\nSubmit Credit Note\nSubmit Self-Billed Invoice\nGet Invoice Status\nGet Reporting Status\nGet Delivery Status\nDownload XML\nDownload PDF\nGet Incoming Invoices\nRegister Webhook\nGet Webhook Subscription\nCustom Operation",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "http_method",
+   "fieldtype": "Select",
+   "label": "HTTP Method",
+   "options": "GET\nPOST\nPUT\nPATCH\nDELETE",
+   "default": "POST",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "relative_url",
+   "fieldtype": "Data",
+   "label": "Relative URL",
+   "length": 500,
+   "in_list_view": 1,
+   "description": "e.g. /invoices/{document_id}. Placeholders: {document_id}, {participant_id}, {invoice_number}."
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "request_content_type",
+   "fieldtype": "Data",
+   "label": "Request Content Type",
+   "default": "application/json"
+  },
+  {
+   "fieldname": "response_content_type",
+   "fieldtype": "Data",
+   "label": "Response Content Type",
+   "default": "application/json"
+  },
+  {
+   "fieldname": "authentication_required",
+   "fieldtype": "Check",
+   "label": "Authentication Required",
+   "default": "1"
+  },
+  {
+   "fieldname": "timeout",
+   "fieldtype": "Int",
+   "label": "Timeout (seconds)",
+   "default": "30"
+  },
+  {
+   "fieldname": "retry_enabled",
+   "fieldtype": "Check",
+   "label": "Retry Enabled"
+  },
+  {
+   "fieldname": "maximum_retries",
+   "fieldtype": "Int",
+   "label": "Maximum Retries",
+   "default": "2"
+  },
+  {
+   "fieldname": "idempotency_enabled",
+   "fieldtype": "Check",
+   "label": "Idempotency Enabled"
+  },
+  {
+   "fieldname": "idempotency_header",
+   "fieldtype": "Data",
+   "label": "Idempotency Header",
+   "default": "Idempotency-Key"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "ASP REST Endpoint",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0,
+ "editable_grid": 1
+}

@@ -1,0 +1,89 @@
+# Ministry of Finance: eInvoicing Accredited Service Providers (ASPs)
+# https://mof.gov.ae/en/about-us/initiatives/einvoicing/einvoicing-accredited-service-providers-asps/
+# Page footer "Last updated on 11/11/2026"; read 2026-11-12. Format: name|accreditation number|website|code (optional)
+Advintek Consulting Services LLC|196766|einvoice.advintek.ae
+Ardentax IT Solutions - FZCO|189050|ardentaxit.tax
+Avalara Gulf Technologies LLC|134809|avalara.com|avalara
+Azdan Business Analytics|147900|azdan.com
+Azentio Software Orion (Middle East) FZ-LLC|141846|azentio.com
+BBIT Accqrate Technology FZCO|101071|bbit-accqrate.com/ae/en
+BDO Digital Solutions FZ-LLC|185520|bdo.ae/en-gb/home
+Bee Aura Tech FZ LLC|179804|bauratec.com
+Casim L.L.C-FZ|178533|casim.ae
+Chaturvedi Software House L.L.C|104596|fincore.solutions
+Citytech Software DMCC|164921|citytechme.com
+Cloud Consulting LLC-FZ (DocFlow)|181172|docflow.ae
+Comarch Middle East FZ LLC|110668|comarch.com/trade-and-services/data-management/e-invoicing/|comarch
+Complyance Electronics L.L.C|112219|complyance.io
+Covoro AI - FZCO|142208|covoro.ai/uae
+Cygnet Digital IT Solutions L.L.C|101139|cygnet.one|cygnet
+Dariba Technologies LLC|158550|daribatech.com
+Data Hub Integrated Solutions Moro LLC|129478|morohub.com/en
+Defmacro Software DMCC (ClearTax)|163162|cleartax.com/ae|cleartax
+Deloitte & Touche - M E|123513|deloitte.com/middle-east/en.html
+Dofort Biztech L.L.C|187633|doforttech.com
+DP World Digital GCC FZE|117846|einvoicing.dpworld.com/home
+Ecosio Emea Information Technology Services - FZCO|132670|ecosio.com
+EDICOM Middle East Services|102434|edicomgroup.com|edicom
+ELITE COMPUTER SYSTEMS AND SOFTWARE DESIGNING - L.L.C|125617|eliteitdesign.com
+EY Consulting LLC|165308|ey.com/en_gl/services/tax/e-invoicing-solution
+Flick Network L.L.C|138271|flick.network/en|flick
+Focus Softnet|134577|focussoftnet.com
+Fonoa Gulf Technology Services LLC|149104|fonoa.com
+Fyient Line Technology LLC|158998|fyient.com
+Fynamics Techno Solutions - FZCO|159905|fynamicstax.com/uae|fynamics
+Gaambit Global Audit & Advisory Services LLC|104125|gaambitglobal.com
+Global Experts of Information Technology Consultants|160689|global-experts.co.uk
+GSS Management Consultancy|167585|gssmcgulf.com
+Hamt Information Technology L.L.C (EVATRA)|144576|hlbhamt.com
+Hamwi Computer Software|131375|fatorly.com
+Infinite IT Solutions FZCO|171157|infinite-it.com
+Infocus Technologies L.L.C-FZ|154195|infocustechnologiesllcfz.com
+Information Dynamics LLC|187021|infodynamic.net
+InvoiceNow biz - F.Z.C|184465|invoicenow.biz
+InvoiceQ For Information Technology Limited|114413|ae.invoiceq.com
+KASA Advisory Services|153288|kasaadvisory.com
+KGRN Chartered Accountants|120915|kgrnaudit.com
+KPI Suitetech DMCC|142349|kpi.co
+LightIdea Information Technology L.L.C|111062|lightidea.org
+Mac & Ross Chartered Accountants LLC|130476|macnross.com
+Marmin AI Software Design LLC|160945|marmin.ai|marmin
+McBitss Technologies CO LLC SOC|143578|mcbitss.com
+Microvista Technologies LLC|157529|microvistatech.com/e-invoicing-in-uae|microvista
+Moore JFC Consulting LLC|158006|moorejfcgroup.com
+Namiri Technology Services L.L.C|104802|digitax.tech
+New Age Software Limited|100511|newage-global.com
+Orchida Soft Computer Systems LLC|194498|orchidatax.com/country-compliance/uae/
+Oxinus Holding Limited|198978|oxinus.holdings
+PACT Software Services LLC|129353|pactsoft.com
+Pagero Gulf FZ-LLC|153759|pagero.com|pagero
+Platform ACube Technologies LLC (A-Cube)|188961|acubeapi.com/en/uae
+Qvalia Technologies|193458|qvalia.com
+Ravera EInvoicing Services - FZCO|199307|ravera.ae
+Resilience Tax Consultant LLC|197640|resilienceuae.com
+RTC Novatech Solutions|139410|rtcsuite.com
+SAP Middle East & North Africa LLC|197202|sap.com/index.html
+Samsotech LLC|192161|samsotech-id.com
+Skill Quotient Technologies|193219|skillquotientgroup.com
+SNB Accounting Management & Tax Consultancy LLC|192393|snbconsulting.ae
+Spendconsole FZ LLC|152306|spendconsole.ai
+SunTec (Xelerate) Business Solutions DMCC|180240|suntecgroup.com/suntec-e-invoicing|suntec_xelerate
+Suntech Business Solutions DMCC|106799|suntech-global.com|suntech
+Tally Software Solutions FZCO|162503|tallysolutions.com
+TAXILLA FINOPS 360 - FZCO|128546|taxilla.com
+Tax Star L.L.C-FZ|175257|taxstar.app
+Taxlabs.ai|166926|taxlab.ai
+Techventures Information Technology Services|105700|techventuresglobal.com
+TronStride FZC|182493|tronstride.com
+UHY James Advisory LLC|148957|uhy-ae.com
+Unified SSK Information Technology L.L.C|163006|unifiedssk.com
+UTC Information Technology Network Services Co. L.L.C.|185561|eand.com/en/etisalat-enterprise.html
+VATit Consultant Gulf Ltd|106062|eezi.io
+Veutel International FZC LLC|149302|veutel.com
+Victorian Fin Technology L.L.C|126326|victorianuae.com
+Vostok Trading LLC|194753|vostok.ae
+Wafeq FZ-LLC|129932|wafeq.com/en-ae|wafeq
+Webtel Technologies solutions- FZCO|133108|webtel.in
+Young Global Technologies L.L.C-FZ|193284|youngglobal.co
+Zennovate IT Solutions|116145|zennovatesystems.com
+Zoho Software Trading LLC|121988|zoho.com
