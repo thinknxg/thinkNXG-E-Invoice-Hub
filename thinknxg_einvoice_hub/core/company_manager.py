@@ -41,12 +41,15 @@ def find_profile_by_tax_id(tenant, tax_id=None, tin=None):
 def profile_party(profile):
 	"""Canonical party block built from the company profile.
 
-	Fields added for Oman (address line 3, contact) are only included when set, so profiles without
+	Fields added for Oman (address line 3, contact) and the UAE (legal registration authority) are only
+	included when set, so profiles without
 	them produce exactly the same party block as before.
 	"""
 	party = _base_party(profile)
 	if profile.get("address_line"):
 		party["address"]["address_line"] = profile.address_line
+	if profile.get("legal_registration_authority"):
+		party["legal_registration_authority"] = profile.legal_registration_authority
 	contact = {k: profile.get(f) for k, f in (("name", "contact_name"), ("phone", "contact_phone"),
 		("email", "contact_email")) if profile.get(f)}
 	if contact:

@@ -20,6 +20,8 @@ INVOICE = {
 	"document": {"document_type": "INVOICE", "invoice_number": "INV-1", "invoice_date": "2026-11-11",
 		"due_date": "2026-12-11", "currency": "AED"},
 	"supplier": {"legal_name": "ABC Trading LLC", "tax_id": "100000000000003",
+		"legal_registration_id": "CN-1234567", "legal_registration_type": "TL",
+		"legal_registration_authority": "Dubai Department of Economy and Tourism",
 		"address": {"street": "Sheikh Zayed Road", "city": "Dubai", "subdivision": "DXB", "country": "AE"}},
 	"customer": {"legal_name": "XYZ LLC", "tax_id": "100234567800003",
 		"address": {"street": "Corniche Road", "city": "Abu Dhabi", "subdivision": "AUH", "country": "AE"}},
@@ -116,7 +118,7 @@ class TestPintAE(unittest.TestCase):
 	def test_credit_note_and_foreign_currency(self):
 		cn = copy.deepcopy(INVOICE)
 		cn["document"].update({"document_type": "CREDIT_NOTE", "currency": "USD", "exchange_rate": 3.6725})
-		cn["references"] = {"original_invoice_number": "INV-0"}
+		cn["references"] = {"original_invoice_number": "INV-0", "credit_reason_code": "DL8.61.1.C"}
 		engine, inv = prepared(cn)
 		self.assertFalse(has_errors(engine.validate(inv)))
 		xml_text = engine.generate_document(inv)["content"]

@@ -4,9 +4,13 @@
   <cbc:ProfileID>urn:peppol:bis:billing</cbc:ProfileID>
   <cbc:ProfileExecutionID>00000000</cbc:ProfileExecutionID>
   <cbc:ID>CN-1</cbc:ID>
+  <cbc:UUID>838b2014-3179-59ea-a017-4f7118b56f45</cbc:UUID>
   <cbc:IssueDate>2026-11-11</cbc:IssueDate>
   <cbc:CreditNoteTypeCode>381</cbc:CreditNoteTypeCode>
   <cbc:DocumentCurrencyCode>AED</cbc:DocumentCurrencyCode>
+  <cac:DiscrepancyResponse>
+    <cbc:ResponseCode>DL8.61.1.D</cbc:ResponseCode>
+  </cac:DiscrepancyResponse>
   <cac:BillingReference>
     <cac:InvoiceDocumentReference>
       <cbc:ID>INV-1</cbc:ID>
@@ -32,6 +36,7 @@
       </cac:PartyTaxScheme>
       <cac:PartyLegalEntity>
         <cbc:RegistrationName>ABC Trading LLC</cbc:RegistrationName>
+        <cbc:CompanyID schemeAgencyID="TL" schemeAgencyName="Dubai Department of Economy and Tourism">CN-1234567</cbc:CompanyID>
       </cac:PartyLegalEntity>
     </cac:Party>
   </cac:AccountingSupplierParty>
@@ -63,6 +68,7 @@
   </cac:PaymentMeans>
   <cac:TaxTotal>
     <cbc:TaxAmount currencyID="AED">100.00</cbc:TaxAmount>
+    <cbc:TaxIncludedIndicator>false</cbc:TaxIncludedIndicator>
     <cac:TaxSubtotal>
       <cbc:TaxableAmount currencyID="AED">2000.00</cbc:TaxableAmount>
       <cbc:TaxAmount currencyID="AED">100.00</cbc:TaxAmount>
@@ -86,6 +92,7 @@
     <cbc:CreditedQuantity unitCode="C62">2</cbc:CreditedQuantity>
     <cbc:LineExtensionAmount currencyID="AED">2000.00</cbc:LineExtensionAmount>
     <cac:Item>
+      <cbc:Description>Consulting</cbc:Description>
       <cbc:Name>Consulting</cbc:Name>
       <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
@@ -97,6 +104,18 @@
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="AED">1000</cbc:PriceAmount>
+      <cbc:BaseQuantity unitCode="C62">1</cbc:BaseQuantity>
+      <cac:AllowanceCharge>
+        <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+        <cbc:Amount currencyID="AED">0</cbc:Amount>
+        <cbc:BaseAmount currencyID="AED">1000</cbc:BaseAmount>
+      </cac:AllowanceCharge>
     </cac:Price>
+    <cac:ItemPriceExtension>
+      <cbc:Amount currencyID="AED">2100.00</cbc:Amount>
+      <cac:TaxTotal>
+        <cbc:TaxAmount currencyID="AED">100.00</cbc:TaxAmount>
+      </cac:TaxTotal>
+    </cac:ItemPriceExtension>
   </cac:CreditNoteLine>
 </CreditNote>

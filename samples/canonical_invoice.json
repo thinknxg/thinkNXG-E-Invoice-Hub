@@ -15,6 +15,7 @@
     "tax_id": "100000000000003",
     "legal_registration_id": "CN-1234567",
     "legal_registration_type": "TL",
+    "legal_registration_authority": "Dubai Department of Economy and Tourism",
     "address": {"street": "Sheikh Zayed Road", "city": "Dubai", "subdivision": "DXB", "country": "AE"}
   },
   "customer": {
@@ -35,6 +36,6 @@
     }
   ],
   "totals": {"subtotal": 2000, "tax_total": 100, "grand_total": 2100},
-  "payment": {"means_code": "30", "terms": "Net 30"},
+  "payment": {"means_code": "30", "iban": "AE070331234567890123456", "terms": "Net 30"},
   "references": {"erp_name": "SAP", "erp_document_id": "100001"}
 }

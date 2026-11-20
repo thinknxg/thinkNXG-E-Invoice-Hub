@@ -53,7 +53,7 @@ official rules on decimals. None of that code had been committed.
 | R6 | Debit note (383) | product | Not in the canonical model |
 | R7 | Summary, continuous supply, import, profit margin, e-commerce, special zone, prepayment | product | Rules and XML implemented; not yet covered by official-Schematron fixtures |
 | R8 | Official resources not bundled (licence and update cycle) | operator | Install per OMAN_FAWTARA_CONFIGURATION.md |
-| R9 | **UAE (pre-existing):** UAE output fails the official PINT AE Schematron (2026.3 / 2026.5 / 2026.11), for example BTAE-07 unique identifier and BTAE-10 AED line amounts missing | product | UAE is not "awaiting validation only"; needs its own fix release. Not changed here by design |
+| R9 | **UAE (pre-existing):** UAE output fails the official PINT AE Schematron (2026.3 / 2026.5 / 2026.11), for example BTAE-07 unique identifier and BTAE-10 AED line amounts missing | product | **Resolved in 0.3.1**: UAE engine rewritten to PINT AE 1.0.5; official Schematron and UBL XSD pass on all fixtures (docs/UAE_PINT_AE_VALIDATION.md). ASP / FTA acceptance still untested |
 | R10 | Screens not tested in a browser | QA | Dashboard / forms checked by code review and API only |
 
 ## 4. Feature matrix

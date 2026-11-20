@@ -70,7 +70,9 @@ Optional official checks (PINT OM Schematron, UBL 2.1 XSD): see `OMAN_FAWTARA_TE
       (the second only on for on-premise ERPs in single-organisation deployments).
 - [ ] Provider's directory entry reflects reality; Production Verified ticked only after tests.
 - [ ] ASP contract verified in the provider's sandbox with official samples.
-- [ ] Generated PINT AE documents validated by the ASP (the hub's checks are a baseline).
+- [ ] Official PINT AE 1.0.5 resources installed and `official_validation` set (docs/UAE_PINT_AE_VALIDATION.md).
+- [ ] UAE company profiles carry legal registration ID, type and authority.
+- [ ] Generated PINT AE documents accepted in the ASP's sandbox (passing the Schematron is not ASP acceptance).
 - [ ] Webhook secrets set per connection; provider retries observed in Webhook Event.
 - [ ] Idempotency enabled on submission endpoints wherever the provider supports it.
 - [ ] Each tenant's users listed on its Integration Tenant with the right access level.

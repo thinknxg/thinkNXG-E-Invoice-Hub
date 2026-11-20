@@ -34,7 +34,22 @@ Oman (PINT OM) options, all optional::
       "subdivision_map": {"Muscat": "MO", "Sohar Free Zone": "SHRFZ"}  # Address.state -> CL-13-OM code
     }
 
-The posting time becomes the invoice issue time (required in Oman, ignored by the UAE engine).
+UAE (PINT AE 1.0.5) options, all optional; the same keys carry UAE codes::
+
+    {
+      "tax_category_map": {"UAE Exempt Residential - ABC": {"category": "EXEMPT",
+                           "exemption_reason_code": "DL8.46.2"},          # DL8.46.1-4 (required for EXEMPT)
+                           "UAE Reverse Charge - ABC": "REVERSE_CHARGE"},
+      "item_field_map": {"item_type": "custom_ae_item_type",            # G | S | B (BTAE-13)
+                         "commodity_code": "custom_hs_code",             # HS code, required for G / B
+                         "rcm_goods_type": "custom_ae_rcm_goods_type",   # DL8.48.x (reverse charge)
+                         "standard_item_id": "custom_gtin",              # GTIN (reverse charge)
+                         "service_accounting_code": "custom_ae_sac"},   # BTAE-17, only for PINT AE 1.0.4 ASPs
+      "credit_reason_field": "custom_ae_credit_reason",                 # DL8.61.1.A-E | VD (BTAE-03)
+      "default_credit_reason_code": "DL8.61.1.D"
+    }
+
+The posting time becomes the invoice issue time (required in Oman, optional IBT-168 in the UAE).
 """
 
 import json

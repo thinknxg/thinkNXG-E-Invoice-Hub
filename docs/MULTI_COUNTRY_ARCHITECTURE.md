@@ -11,7 +11,7 @@ Invoice processing engine                          services/invoice_service.py
     ├──────────────────────────────┐
     ▼                              ▼
 UAE engine  uae_pint_ae            Oman engine  om_pint_om             (future: further engines)
-PINT AE 1.0.3 / UBL 2.1            PINT OM 1.0.1 / UBL 2.1
+PINT AE 1.0.5 / UBL 2.1            PINT OM 1.0.1 / UBL 2.1
     ▼                              ▼
 ASP adapter (UAE provider)         ASP adapter (Oman provider)          asp_connectors/
     ▼                              ▼
