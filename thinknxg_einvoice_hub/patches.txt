@@ -2,3 +2,4 @@
 
 [post_model_sync]
 thinknxg_einvoice_hub.patches.v0_2.backfill_lifecycle_status
+thinknxg_einvoice_hub.patches.v0_3.country_code_backfill

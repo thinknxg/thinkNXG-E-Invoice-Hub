@@ -11,13 +11,16 @@ ERP connectors  ->  Universal Invoice Engine  ->  Compliance Engine  ->  ASP con
    (inbound and outbound, both directions)
 ```
 
-The UAE (Peppol PINT AE) is the first country implementation, not the identity of
-the product. Further countries are added as compliance engines.
+Two country engines run side by side on the same canonical model: the UAE (Peppol PINT AE)
+and Oman (Fawtara, Peppol PINT OM 1.0.1). Further countries are added as compliance engines
+(`docs/MULTI_COUNTRY_ARCHITECTURE.md`).
 
-## What is in this release (0.2.0)
+## What is in this release (0.3.0)
 
 | Area | Status |
 | --- | --- |
+| **Oman Fawtara engine** (`om_pint_om`, PINT OM 1.0.1): mapping, credit notes, self-billing, B2C, export, foreign currency, Invoice UUID / Seller UUID / QR, validation, official Schematron hook | Implemented; output passes the official PINT OM 1.0.1 Schematron and UBL 2.1 XSD on all test fixtures; bench tested with a **mock** provider. No accredited Oman provider integrated or sandbox-tested yet |
+| Country-aware API (`api.oman.*`), dashboard country filter, multi-country inbound routing | Implemented, bench tested |
 | Canonical invoice model, mapper, UAE PINT AE engine (baseline; see "Compliance scope") | Implemented, unit tested |
 | Outbound / inbound pipelines, retry engine, reconciliation, Universal API, signed webhooks | Implemented, tested on a v16 bench |
 | Independent lifecycle tracking: internal validation, ASP submission, FTA reporting, Peppol delivery, ERP sync | Implemented, tested on a v16 bench with a mock ASP |
@@ -158,6 +161,11 @@ Configuration (header and line rules with transforms: Date, Number, Value Map, C
 Pull mode and status callbacks are configured through Extra Configuration; see
 `erp_connectors/custom/connector.py`.
 
+## Oman documentation
+
+`docs/OMAN_FAWTARA_SPECIFICATION.md` (requirements and sources), `..._IMPLEMENTATION.md`, `..._CONFIGURATION.md`,
+`..._API.md`, `..._VALIDATION.md`, `..._TESTING.md`, `OMAN_GAP_REPORT.md`; samples in `samples/oman/` (test fixtures).
+
 ## Connecting an ASP
 
 Create an **ASP REST API Configuration** from the provider's API documentation and an ASP Connection
@@ -191,6 +199,11 @@ Classes are loaded only from installed code, never from a path stored in the dat
 
 ## Compliance scope (read before going live)
 
+* **Oman**: see `docs/OMAN_FAWTARA_SPECIFICATION.md` and `docs/OMAN_GAP_REPORT.md`. Passing the official
+  Schematron is not acceptance by an accredited provider or the Oman Tax Authority; production use needs an
+  accredited provider integration tested in its sandbox and the taxpayer onboarded on the Fawtara Portal.
+* **UAE, known issue**: the UAE output does not yet pass the official PINT AE Schematron (checked against the
+  2026.3, 2026.5 and 2026.11 releases); see `docs/OMAN_GAP_REPORT.md` R9.
 * The UAE engine is a PINT AE-aligned baseline (specification 1.0.3 identifiers). Its checks
   use the hub's own rule IDs (`EIH-AE-*`) and catch data problems early; they are not the
   official PINT AE Schematron.

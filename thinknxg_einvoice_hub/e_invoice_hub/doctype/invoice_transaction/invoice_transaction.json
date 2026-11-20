@@ -12,6 +12,9 @@
   "status",
   "invoice_number",
   "invoice_date",
+  "document_uuid",
+  "country_code",
+  "peppol_delivery_expected",
   "duplicate_of",
   "validation_status",
   "sb_parties",
@@ -109,7 +112,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Received\nNormalized\nValidated\nValidation Failed\nSubmitted\nDelivered\nRejected\nRetrying\nFailed\nDuplicate\nCancelled",
+   "options": "Received\nNormalized\nValidated\nValidation Failed\nSubmitted\nDelivered\nReported\nRejected\nRetrying\nFailed\nDuplicate\nCancelled",
    "default": "Received",
    "in_list_view": 1,
    "in_standard_filter": 1,
@@ -129,6 +132,32 @@
    "fieldtype": "Date",
    "label": "Invoice Date",
    "read_only": 1
+  },
+  {
+   "fieldname": "document_uuid",
+   "fieldtype": "Data",
+   "label": "Document UUID",
+   "read_only": 1,
+   "search_index": 1,
+   "description": "Invoice UUID where the country requires one (Oman BTOM-002)."
+  },
+  {
+   "fieldname": "country_code",
+   "fieldtype": "Data",
+   "label": "Country",
+   "length": 2,
+   "read_only": 1,
+   "in_standard_filter": 1,
+   "search_index": 1,
+   "description": "Country of the compliance engine that processed this document."
+  },
+  {
+   "fieldname": "peppol_delivery_expected",
+   "fieldtype": "Check",
+   "label": "Peppol Delivery Expected",
+   "default": "1",
+   "read_only": 1,
+   "description": "Cleared when the receiver is outside Peppol (e.g. Oman B2C or export): the provider only reports to the tax authority, and a confirmed report completes the document as 'Reported'."
   },
   {
    "fieldname": "duplicate_of",
@@ -190,21 +219,21 @@
    "fieldname": "subtotal",
    "fieldtype": "Float",
    "label": "Subtotal",
-   "precision": "2",
+   "precision": "3",
    "read_only": 1
   },
   {
    "fieldname": "tax_total",
    "fieldtype": "Float",
    "label": "Tax Total",
-   "precision": "2",
+   "precision": "3",
    "read_only": 1
   },
   {
    "fieldname": "grand_total",
    "fieldtype": "Float",
    "label": "Grand Total",
-   "precision": "2",
+   "precision": "3",
    "read_only": 1,
    "in_list_view": 1
   },
@@ -337,12 +366,12 @@
   {
    "fieldname": "sb_fta",
    "fieldtype": "Section Break",
-   "label": "FTA Reporting and Peppol Delivery"
+   "label": "Tax Authority Reporting and Peppol Delivery"
   },
   {
    "fieldname": "fta_status",
    "fieldtype": "Select",
-   "label": "FTA Reporting Status",
+   "label": "Tax Authority Reporting Status",
    "read_only": 1,
    "in_standard_filter": 1,
    "in_list_view": 1,
@@ -352,19 +381,19 @@
   {
    "fieldname": "fta_reference",
    "fieldtype": "Data",
-   "label": "FTA Reporting Reference",
+   "label": "Tax Authority Reporting Reference",
    "read_only": 1
   },
   {
    "fieldname": "fta_message",
    "fieldtype": "Small Text",
-   "label": "FTA Message",
+   "label": "Tax Authority Message",
    "read_only": 1
   },
   {
    "fieldname": "fta_reported_at",
    "fieldtype": "Datetime",
-   "label": "FTA Reported At",
+   "label": "Tax Authority Reported At",
    "read_only": 1
   },
   {

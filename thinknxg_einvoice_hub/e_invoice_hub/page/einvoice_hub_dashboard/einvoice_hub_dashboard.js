@@ -8,6 +8,11 @@ frappe.pages["einvoice-hub-dashboard"].on_page_load = function (wrapper) {
 	const add = (df) => {
 		filters[df.fieldname] = page.add_field({ ...df, change: () => refresh() });
 	};
+	add({
+		fieldname: "country", label: __("Country"), fieldtype: "Select",
+		options: [{ value: "", label: __("All countries") }, { value: "AE", label: __("UAE") },
+			{ value: "OM", label: __("Oman") }],
+	});
 	add({ fieldname: "company", label: __("Company"), fieldtype: "Link", options: "Company Integration Profile" });
 	add({ fieldname: "erp_connection", label: __("ERP"), fieldtype: "Link", options: "ERP Connection" });
 	add({ fieldname: "asp_connection", label: __("ASP"), fieldtype: "Link", options: "ASP Connection" });
@@ -18,7 +23,12 @@ frappe.pages["einvoice-hub-dashboard"].on_page_load = function (wrapper) {
 		options: ["", "INVOICE", "CREDIT_NOTE", "SELF_BILLING_INVOICE", "SELF_BILLING_CREDIT_NOTE"],
 	});
 	add({
-		fieldname: "fta_status", label: __("FTA Reporting"), fieldtype: "Select",
+		fieldname: "status", label: __("Transaction Status"), fieldtype: "Select",
+		options: ["", "Received", "Normalized", "Validated", "Validation Failed", "Submitted", "Delivered",
+			"Reported", "Rejected", "Retrying", "Failed", "Cancelled", "Duplicate"],
+	});
+	add({
+		fieldname: "fta_status", label: __("Tax Authority Reporting"), fieldtype: "Select",
 		options: ["", "Not Applicable", "Pending", "Reported", "Rejected"],
 	});
 	add({
@@ -61,20 +71,28 @@ frappe.pages["einvoice-hub-dashboard"].on_page_load = function (wrapper) {
 				]) +
 				section(__("Invoices"), [
 					card(__("Received"), i.received, null, ["List", t, {}]),
+					card(__("Validated"), i.validated, "green-600", ["List", t, { validation_status: "Passed" }]),
 					card(__("Submitted to ASP"), i.submitted, null, ["List", t, { asp_submission_status: ["!=", "Not Submitted"] }]),
 					card(__("ASP accepted"), i.asp_accepted, "green-600", ["List", t, { asp_submission_status: "Accepted" }]),
 					card(__("ASP rejected"), i.asp_rejected, "red-600", ["List", t, { asp_submission_status: "Rejected" }]),
-					card(__("FTA reported"), i.fta_reported, "green-600", ["List", t, { fta_status: "Reported" }]),
-					card(__("FTA rejected"), i.fta_rejected, "red-600", ["List", t, { fta_status: "Rejected" }]),
+					card(__("Tax authority: reported"), i.fta_reported, "green-600", ["List", t, { fta_status: "Reported" }]),
+					card(__("Tax authority: pending acknowledgement"), i.fta_pending, "orange-600", ["List", t, { fta_status: "Pending" }]),
+					card(__("Tax authority: rejected"), i.fta_rejected, "red-600", ["List", t, { fta_status: "Rejected" }]),
+					card(__("Peppol delivered"), i.delivered, "green-600", ["List", t, { delivery_status: "Delivered" }]),
 					card(__("Delivery failures"), i.delivery_failed, "red-600", ["List", t, { delivery_status: "Failed" }]),
 					card(__("Validation failures"), i.validation_failed, "orange-600", ["List", t, { status: "Validation Failed" }]),
 				]) +
 				section(__("Attention"), [
 					card(__("Pending ERP synchronization"), i.pending_sync, "orange-600",
 						["List", t, { erp_sync_status: ["in", ["Pending", "Failed"]] }]),
-					card(__("Integration errors"), i.errors, "red-600", ["List", t, { status: ["in", ["Failed", "Retrying"]] }]),
+					card(__("Retry queue"), i.retry_queue, "orange-600", ["List", t, { status: "Retrying" }]),
+					card(__("Failed transactions"), i.failed, "red-600", ["List", t, { status: "Failed" }]),
 					card(__("Failed API calls"), d.api_failures, "red-600", ["List", "Integration Log", { result: "Failure" }]),
-				])
+				]) +
+				section(__("By country"), Object.entries(d.by_country || {}).map(([code, n]) =>
+					card(code === "OM" ? __("Oman") : code === "AE" ? __("UAE") : code, n, null,
+						["List", t, code === "Unassigned" ? { country_code: ["is", "not set"] } : { country_code: code }]))) +
+				`<p class="text-muted small">${esc(__("Internal validation, provider submission, tax authority reporting and Peppol delivery are separate statuses. A submission accepted by the provider is not proof of tax authority reporting or delivery."))}</p>`
 			);
 			body.find("[data-route]").on("click", function () {
 				const route = JSON.parse($(this).attr("data-route"));

@@ -16,6 +16,25 @@ Optional ``extra_config`` keys on the ERP Connection::
       "use_source_item_codes": false,
       "purchase_taxes_template": "UAE VAT 5% - ABC"
     }
+
+Oman (PINT OM) options, all optional::
+
+    {
+      "default_country": "OM",
+      "tax_category_map": {"Oman Zero Food - ABC": {"category": "ZERO_RATED",
+                           "exemption_reason_code": "VATZR-OM-01"}},      # dict values carry reason codes
+      "item_field_map": {"item_type": "custom_om_item_type",            # Sales Invoice Item field names
+                         "commodity_code": "custom_hs_code",
+                         "industry_code": "custom_isic_code",
+                         "service_type": "custom_om_service_type"},
+      "credit_reason_field": "custom_om_credit_reason",                 # CAN | VAT | VAL | QTY | OTH
+      "default_credit_reason_code": "CAN",
+      "b2c_field": "custom_om_b2c",                                     # truthy -> B2C (simplified) invoice
+      "address_line3_field": "custom_address_line3",
+      "subdivision_map": {"Muscat": "MO", "Sohar Free Zone": "SHRFZ"}  # Address.state -> CL-13-OM code
+    }
+
+The posting time becomes the invoice issue time (required in Oman, ignored by the UAE engine).
 """
 
 import json
@@ -25,6 +44,7 @@ from urllib.parse import quote
 from thinknxg_einvoice_hub.canonical.purchase_invoice_schema import to_purchase_view
 from thinknxg_einvoice_hub.erp_connectors.base_connector import ALL_CAPABILITIES, BaseERPConnector
 from thinknxg_einvoice_hub.exceptions import PermanentError
+from thinknxg_einvoice_hub.utils import currency_places
 
 
 def _f(value):
@@ -74,14 +94,18 @@ class ERPNextConnector(BaseERPConnector):
 			code = None
 			if addr.get("country"):
 				code = (self._get_doc("Country", addr["country"]).get("code") or "").upper() or None
-			return {
+			state = addr.get("state")
+			out = {
 				"street": addr.get("address_line1"),
 				"additional_street": addr.get("address_line2"),
 				"city": addr.get("city"),
 				"postal_code": addr.get("pincode"),
-				"subdivision": addr.get("state"),
+				"subdivision": (self.extra.get("subdivision_map") or {}).get(state, state),
 				"country": code,
 			}
+			if self.extra.get("address_line3_field") and addr.get(self.extra["address_line3_field"]):
+				out["address_line"] = addr.get(self.extra["address_line3_field"])
+			return out
 		except PermanentError:
 			return None  # the integration user may not be allowed to read addresses
 
@@ -107,11 +131,15 @@ class ERPNextConnector(BaseERPConnector):
 		return [row["name"] for row in self._list("Sales Invoice", conditions, limit=limit)]
 
 	def _tax_category(self, item, rate):
+		"""Canonical category plus optional exemption reason (code, text) for a Sales Invoice Item."""
 		table = self.extra.get("tax_category_map") or {}
 		template = item.get("item_tax_template")
 		if template and template in table:
-			return table[template]
-		return "STANDARD" if rate > 0 else self.extra.get("zero_rate_category", "ZERO_RATED")
+			entry = table[template]
+			if isinstance(entry, dict):
+				return entry.get("category"), entry.get("exemption_reason_code"), entry.get("exemption_reason")
+			return entry, None, None
+		return ("STANDARD" if rate > 0 else self.extra.get("zero_rate_category", "ZERO_RATED")), None, None
 
 	def normalize_invoice(self, inv):
 		if self.mapping and self.mapping.get("rules"):
@@ -120,6 +148,8 @@ class ERPNextConnector(BaseERPConnector):
 			return super().normalize_invoice(inv)
 
 		is_return = bool(int(inv.get("is_return") or 0))
+		places = currency_places(inv.get("currency"))
+		item_map = self.extra.get("item_field_map") or {}
 		default_rate = sum(_f(t.get("rate")) for t in inv.get("taxes") or [] if t.get("charge_type") == "On Net Total")
 		lines = []
 		for item in inv.get("items") or []:
@@ -131,7 +161,8 @@ class ERPNextConnector(BaseERPConnector):
 			except ValueError:
 				pass
 			net = abs(_f(item.get("net_amount") if item.get("net_amount") is not None else item.get("amount")))
-			lines.append({
+			category, reason_code, reason = self._tax_category(item, rate)
+			line = {
 				"item_code": item.get("item_code"),
 				"item_name": item.get("item_name"),
 				"description": item.get("item_name") or item.get("description"),
@@ -139,10 +170,17 @@ class ERPNextConnector(BaseERPConnector):
 				"unit_code": (self.extra.get("uom_map") or {}).get(item.get("uom")),
 				"unit_price": abs(_f(item.get("net_rate") if item.get("net_rate") is not None else item.get("rate"))),
 				"net_amount": net,
-				"tax_category": self._tax_category(item, rate),
+				"tax_category": category,
 				"tax_rate": rate,
-				"tax_amount": round(net * rate / 100, 2),
-			})
+				"tax_amount": round(net * rate / 100, places),
+			}
+			if reason_code:
+				line["exemption_reason_code"] = reason_code
+				line["exemption_reason"] = reason
+			for key, field in item_map.items():
+				if item.get(field) not in (None, ""):
+					line[key] = item.get(field)
+			lines.append(line)
 
 		addresses = inv.get("_addresses") or {}
 		default_country = self.extra.get("default_country", "AE")
@@ -151,6 +189,23 @@ class ERPNextConnector(BaseERPConnector):
 		supplier_addr = addresses.get("company") or {}
 		grand = abs(_f(inv.get("grand_total")))
 		rounded = abs(_f(inv.get("rounded_total"))) or grand
+		posting_time = str(inv.get("posting_time") or "").split(".")[0] or None
+		if posting_time and len(posting_time) == 7:  # 9:05:00 -> 09:05:00
+			posting_time = "0" + posting_time
+		references = {
+			"erp_name": "ERPNext",
+			"erp_document_id": inv.get("name"),
+			"order_reference": inv.get("po_no"),
+			"original_invoice_number": inv.get("return_against"),
+		}
+		if is_return:
+			reason = inv.get(self.extra["credit_reason_field"]) if self.extra.get("credit_reason_field") else None
+			reason = reason or self.extra.get("default_credit_reason_code")
+			if reason:
+				references["credit_reason_code"] = reason
+		extensions = {}
+		if self.extra.get("b2c_field") and inv.get(self.extra["b2c_field"]):
+			extensions = {"om": {"b2c": True}}
 		return {
 			"schema_version": "1.0",
 			"document": {
@@ -158,6 +213,7 @@ class ERPNextConnector(BaseERPConnector):
 				"invoice_kind": "TAX",
 				"invoice_number": inv.get("name"),
 				"invoice_date": inv.get("posting_date"),
+				"issue_time": posting_time,
 				"due_date": inv.get("due_date"),
 				"currency": inv.get("currency"),
 				"exchange_rate": inv.get("conversion_rate") or 1,
@@ -179,16 +235,12 @@ class ERPNextConnector(BaseERPConnector):
 				"subtotal": abs(_f(inv.get("net_total"))),
 				"tax_total": abs(_f(inv.get("total_taxes_and_charges"))),
 				"grand_total": grand,
-				"rounding_amount": round(rounded - grand, 2),
+				"rounding_amount": round(rounded - grand, places),
 				"payable_amount": rounded,
 			},
 			"payment": {"terms": inv.get("payment_terms_template")},
-			"references": {
-				"erp_name": "ERPNext",
-				"erp_document_id": inv.get("name"),
-				"order_reference": inv.get("po_no"),
-				"original_invoice_number": inv.get("return_against"),
-			},
+			"references": references,
+			"extensions": extensions,
 		}
 
 	def update_invoice_status(self, document_id, status, details=None):
@@ -211,6 +263,8 @@ class ERPNextConnector(BaseERPConnector):
 			update[self.extra["status_field"]] = status
 		if self.extra.get("reference_field") and details.get("asp_reference"):
 			update[self.extra["reference_field"]] = details["asp_reference"]
+		if self.extra.get("uuid_field") and details.get("document_uuid"):
+			update[self.extra["uuid_field"]] = details["document_uuid"]
 		if update:
 			self.http.json("PUT", self._resource("Sales Invoice", document_id), json=update)
 		return True

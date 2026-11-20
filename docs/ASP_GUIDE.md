@@ -65,7 +65,9 @@ or `path` (exists).
 
 Map provider fields to: success, asp_document_id, submission_reference, submission_status,
 fta_status, fta_reference, delivery_status, delivery_reference, error_code, error_message, xml_url,
-pdf_url, timestamp. Use `map:{...}` to translate the provider's status words into ACCEPTED /
+pdf_url, timestamp, invoice_mls_code, tdd_mls_code. The two MLS fields take Peppol Message Level Status codes
+(AP / AB / RE); the Oman engine turns the invoice MLS into Peppol delivery and the TDD MLS into tax-authority
+reporting. Use `map:{...}` to translate the provider's status words into ACCEPTED /
 REJECTED / PENDING, PENDING / REPORTED / REJECTED and PENDING / DELIVERED / FAILED.
 
 ### Webhooks and polling
@@ -89,3 +91,12 @@ anything at runtime. It has never been run against the Wafeq sandbox, and value 
 Subclass `ConfiguredRestAdapter` (or `BaseASPConnector`), override only what differs, register it
 in `asp_connectors/adapter_registry.py` or through the `einvoice_hub_asp_adapters` hook, and declare
 capabilities truthfully.
+
+## Oman accredited providers
+
+Under the Oman model the accredited provider (C2) validates the PINT OM invoice, sends it over Peppol to the buyer's
+provider (C3), builds the Tax Data Document and sends it to the OTA access point (C5). The hub submits the PINT OM
+XML (or the provider's JSON, through request mappings) and tracks two MLS results. No Oman provider adapter exists
+yet: connect one with a REST API Configuration once its API documentation is available, map its MLS / status fields
+as above, and test it in the provider's sandbox (`OMAN_FAWTARA_TESTING.md`). `tests/mock_oman_provider.py` is a
+test double only.

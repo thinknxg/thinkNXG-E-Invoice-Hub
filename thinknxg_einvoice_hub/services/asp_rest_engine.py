@@ -44,6 +44,8 @@ AUTH_TYPES = (
 PLATFORM_FIELDS = (
 	"success", "asp_document_id", "submission_reference", "submission_status", "fta_status", "fta_reference",
 	"delivery_status", "delivery_reference", "error_code", "error_message", "xml_url", "pdf_url", "timestamp",
+	# Peppol Message Level Status codes (AP / AB / RE); the country engine turns them into reporting / delivery
+	"invoice_mls_code", "tdd_mls_code",
 )
 SECRET_KEYS = ("api_key", "api_secret", "client_secret", "password", "refresh_token", "static_authorization_header",
 	"signing_secret")

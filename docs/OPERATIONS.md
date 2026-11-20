@@ -8,7 +8,7 @@ bench --site <site> install-app thinknxg_einvoice_hub
 bench --site <site> migrate
 ```
 
-Creates roles, connector / adapter catalogues, the UAE compliance profile, the ASP directory
+Creates roles, connector / adapter catalogues, the UAE and Oman compliance profiles, the ASP directory
 (86 entries) and the Wafeq preset. Scheduler and workers must run.
 
 ## Upgrade from 0.1.x to 0.2.0
@@ -25,13 +25,35 @@ Delivery for existing transactions from their old status. FTA Reporting stays "N
 old documents because it was not recorded. Existing statuses, API responses and webhook URLs are
 unchanged; the API responses gain fields.
 
+## Upgrade from 0.2.x to 0.3.0 (Oman)
+
+```bash
+bench --site <site> backup
+bench update --apps thinknxg_einvoice_hub      # or replace the app folder
+bench pip install saxonche                     # optional: official PINT OM Schematron
+bench --site <site> migrate
+```
+
+`migrate` adds the Compliance Tax Rule table and the fields `country_code`, `document_uuid` (already present),
+`peppol_delivery_expected`, creates the `om_pint_om` Compliance Profile and runs
+`patches.v0_3.country_code_backfill`, which only fills empty `country_code` values (AE for UAE profiles). UAE
+documents are generated exactly as before (byte-identical regression goldens). Tested on a v0.2.0 site with UAE
+data: transactions, payloads and validation messages unchanged.
+
+Rollback: disable the Oman Compliance Profile, restore the previous app version and run `bench migrate`; the added
+columns stay unused. Restore the backup only if you need to remove them.
+
+Oman configuration: `OMAN_FAWTARA_CONFIGURATION.md`. Oman checks on a site:
+`bench --site <site> execute thinknxg_einvoice_hub.tests.bench_oman.run --kwargs "{'resources': '/opt/pint-om-resources-1.0.1'}"`.
+
 ## Automated tests (no bench needed)
 
 ```bash
-python -m unittest thinknxg_einvoice_hub.tests.test_engine \
-  thinknxg_einvoice_hub.tests.test_rest_engine thinknxg_einvoice_hub.tests.test_presets \
-  thinknxg_einvoice_hub.asp_connectors.uae.microvista.tests.test_microvista
+python -m unittest discover -s thinknxg_einvoice_hub/tests -t .
+python -m unittest thinknxg_einvoice_hub.asp_connectors.uae.microvista.tests.test_microvista
 ```
+
+Optional official checks (PINT OM Schematron, UBL 2.1 XSD): see `OMAN_FAWTARA_TESTING.md`.
 
 ## Sandbox testing with the mock ASP
 

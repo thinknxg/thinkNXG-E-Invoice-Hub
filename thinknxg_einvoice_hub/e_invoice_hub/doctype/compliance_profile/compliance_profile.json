@@ -12,6 +12,7 @@
   "standard",
   "spec_version",
   "engine_code",
+  "country_code",
   "default_currency",
   "sb_ids",
   "customization_id",
@@ -19,7 +20,12 @@
   "cb2",
   "selfbilling_customization_id",
   "selfbilling_profile_id",
-  "endpoint_scheme"
+  "endpoint_scheme",
+  "sb_settings",
+  "environment",
+  "engine_settings",
+  "sb_tax",
+  "tax_rules"
  ],
  "fields": [
   {
@@ -70,7 +76,15 @@
    "fieldtype": "Data",
    "label": "Engine Code",
    "reqd": 1,
-   "description": "Compliance engine registered in the app, e.g. uae_pint_ae"
+   "description": "Compliance engine registered in the app, e.g. uae_pint_ae, om_pint_om"
+  },
+  {
+   "fieldname": "country_code",
+   "fieldtype": "Data",
+   "label": "Country Code (ISO 3166-1)",
+   "length": 2,
+   "in_list_view": 1,
+   "in_standard_filter": 1
   },
   {
    "fieldname": "default_currency",
@@ -115,6 +129,40 @@
    "fieldname": "endpoint_scheme",
    "fieldtype": "Data",
    "label": "Participant Identifier Scheme"
+  },
+  {
+   "fieldname": "sb_settings",
+   "fieldtype": "Section Break",
+   "label": "Engine Settings",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "environment",
+   "fieldtype": "Select",
+   "label": "Environment",
+   "options": "Sandbox\nProduction",
+   "default": "Sandbox",
+   "description": "Informational: which provider environment this profile is used with."
+  },
+  {
+   "fieldname": "engine_settings",
+   "fieldtype": "Code",
+   "label": "Engine Settings (JSON)",
+   "options": "JSON",
+   "description": "Country-specific settings passed to the compliance engine. Oman example: {\"schematron_dir\": \"/opt/pint-om-resources-1.0.1\", \"official_validation\": \"required\"}. See docs/OMAN_FAWTARA_CONFIGURATION.md."
+  },
+  {
+   "fieldname": "sb_tax",
+   "fieldtype": "Section Break",
+   "label": "Tax Rules",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "tax_rules",
+   "fieldtype": "Table",
+   "label": "Tax Rules",
+   "options": "Compliance Tax Rule",
+   "description": "Effective-dated VAT rates and category codes. Empty: the engine's built-in table applies."
   }
  ],
  "index_web_pages_for_search": 0,

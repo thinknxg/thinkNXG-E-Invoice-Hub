@@ -18,12 +18,39 @@ def get_compliance_engine(profile_name):
 	cp = frappe.get_cached_doc("Compliance Profile", profile_name)
 	if not cp.enabled:
 		raise PermanentError(f"Compliance profile {profile_name} is disabled")
+	return get_engine(cp.engine_code, engine_settings(cp))
+
+
+def engine_settings(cp):
+	"""Settings dict for a Compliance Profile: fixed fields, then the JSON engine settings, then tax rules.
+
+	Fixed fields keep their meaning for every country. ``engine_settings`` (JSON) carries country-specific
+	options. Active ``tax_rules`` rows become ``standard_rate_schedule`` / ``category_codes`` overrides, so a
+	rate change is configuration, not code.
+	"""
 	settings = {
 		field: cp.get(field)
 		for field in ("customization_id", "profile_id", "selfbilling_customization_id", "selfbilling_profile_id",
 			"endpoint_scheme", "default_currency")
 	}
-	return get_engine(cp.engine_code, settings)
+	raw = cp.get("engine_settings")
+	if raw:
+		try:
+			extra = frappe.parse_json(raw)
+		except Exception as e:
+			raise PermanentError(f"Engine settings of compliance profile {cp.name} are not valid JSON: {e}") from e
+		if not isinstance(extra, dict):
+			raise PermanentError(f"Engine settings of compliance profile {cp.name} must be a JSON object")
+		settings.update(extra)
+	rules = [r for r in (cp.get("tax_rules") or []) if r.get("active")]
+	if rules:
+		schedule = [(str(r.effective_from), str(r.rate)) for r in rules if r.tax_category == "STANDARD"]
+		if schedule:
+			settings["standard_rate_schedule"] = schedule
+		codes = {r.tax_category: r.tax_code for r in rules if r.tax_code}
+		if codes:
+			settings["category_codes"] = {**(settings.get("category_codes") or {}), **codes}
+	return settings
 
 
 def resolve_outbound_asp(txn, company_profile):

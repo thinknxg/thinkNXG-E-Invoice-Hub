@@ -63,7 +63,7 @@ def perms(admin="full", tadmin=None, tuser=None):
 
 AUTH = sel("None", "API Key and Secret", "Basic", "Bearer Token", "OAuth2 Client Credentials")
 DOC_TYPES = sel("INVOICE", "CREDIT_NOTE", "SELF_BILLING_INVOICE", "SELF_BILLING_CREDIT_NOTE")
-STATUSES = sel("Received", "Normalized", "Validated", "Validation Failed", "Submitted", "Delivered",
+STATUSES = sel("Received", "Normalized", "Validated", "Validation Failed", "Submitted", "Delivered", "Reported",
                "Rejected", "Retrying", "Failed", "Duplicate", "Cancelled")
 
 
@@ -181,7 +181,8 @@ DOCTYPES = {
             C("cb1"),
             F("standard", in_list_view=1),
             F("spec_version", "Data", "Specification Version"),
-            F("engine_code", reqd=1, description="Compliance engine registered in the app, e.g. uae_pint_ae"),
+            F("engine_code", reqd=1, description="Compliance engine registered in the app, e.g. uae_pint_ae, om_pint_om"),
+            F("country_code", "Data", "Country Code (ISO 3166-1)", length=2, in_list_view=1, in_standard_filter=1),
             F("default_currency", "Data", length=3),
             S("sb_ids", "Specification Identifiers"),
             F("customization_id", "Data", "Customization ID", length=255),
@@ -190,6 +191,29 @@ DOCTYPES = {
             F("selfbilling_customization_id", "Data", "Self-Billing Customization ID", length=255),
             F("selfbilling_profile_id", "Data", "Self-Billing Profile ID", length=255),
             F("endpoint_scheme", "Data", "Participant Identifier Scheme"),
+            S("sb_settings", "Engine Settings", collapsible=1),
+            F("environment", "Select", options=sel("Sandbox", "Production"), default="Sandbox",
+              description="Informational: which provider environment this profile is used with."),
+            F("engine_settings", "Code", "Engine Settings (JSON)", options="JSON",
+              description="Country-specific settings passed to the compliance engine. Oman example: "
+                          "{\"schematron_dir\": \"/opt/pint-om-resources-1.0.1\", \"official_validation\": \"required\"}. "
+                          "See docs/OMAN_FAWTARA_CONFIGURATION.md."),
+            S("sb_tax", "Tax Rules", collapsible=1),
+            F("tax_rules", "Table", "Tax Rules", options="Compliance Tax Rule",
+              description="Effective-dated VAT rates and category codes. Empty: the engine's built-in table applies."),
+        ]),
+    "Compliance Tax Rule": dict(
+        istable=1,
+        fields=[
+            F("tax_category", "Select", in_list_view=1, reqd=1,
+              options=sel("STANDARD", "ZERO_RATED", "EXEMPT", "OUT_OF_SCOPE", "REVERSE_CHARGE", "MARGIN_SCHEME")),
+            F("tax_code", "Data", "Country Category Code", in_list_view=1, length=10),
+            F("rate", "Float", "Rate (%)", in_list_view=1, precision="2"),
+            F("treatment", "Data", "Tax Treatment"),
+            F("effective_from", "Date", in_list_view=1, reqd=1),
+            F("effective_to", "Date"),
+            F("regulatory_reference", "Data", length=255),
+            F("active", "Check", default="1", in_list_view=1),
         ]),
     # ------------------------------------------------------------------ tenant config
     "ERP Connection": dict(
@@ -240,23 +264,37 @@ DOCTYPES = {
               set_only_once=1),
             F("enabled", "Check", default="1", in_list_view=1),
             C("cb0"),
-            F("tax_id", "Data", "Tax Registration Number (TRN)", reqd=1, in_list_view=1, search_index=1),
-            F("tin", "Data", "Tax Identification Number (TIN)",
-              description="Network participant identifier. For the UAE this is derived from the first 10 "
-                          "digits of the TRN when left empty."),
+            F("tax_id", "Data", "VAT Registration Number (TRN / VATIN)", reqd=1, in_list_view=1, search_index=1,
+              description="UAE: 15-digit TRN. Oman: VATIN, OM followed by 10 digits."),
+            F("tin", "Data", "Network Address (TIN / VATIN)",
+              description="Network participant identifier. UAE: derived from the first 10 digits of the TRN "
+                          "(scheme 0235). Oman: the VATIN itself (scheme 0248). Derived when left empty."),
             F("participant_id", "Data", "Network Participant ID", read_only=1),
             F("legal_registration_id", "Data", "Legal Registration ID"),
-            F("legal_registration_type", "Select", options=sel("", "TL", "EID", "PAS", "CD"),
-              description="TL = Trade Licence, EID = Emirates ID, PAS = Passport, CD = Cabinet Decision"),
+            F("legal_registration_type", "Select",
+              options=sel("", "TL", "EID", "PAS", "CD", "CR", "TIN", "CID", "PASNUM", "OTHID", "ICID", "SZLN"),
+              description="UAE: TL = Trade Licence, EID = Emirates ID, PAS = Passport, CD = Cabinet Decision. "
+                          "Oman (CL-06-OM): CR = Commercial Registration, TIN, CID = Civil ID, PASNUM = Passport, "
+                          "OTHID = Other, ICID = Importer Customs ID, SZLN = Special Zone Licence"),
             S("sb_addr", "Registered Address"),
             F("street"),
             F("additional_street"),
+            F("address_line", "Data", "Address Line 3",
+              description="Required on Oman invoices together with street, additional street, city and postal code (IBR-010-OM)."),
             F("city"),
             C("cb_addr"),
-            F("subdivision", "Data", "Emirate / State Code", description="e.g. AUH, DXB, SHJ, AJM, UAQ, RAK, FUJ"),
+            F("subdivision", "Data", "Emirate / Zone Code",
+              description="UAE emirate: AUH, DXB, SHJ, AJM, UAQ, RAK, FUJ. Oman (CL-13-OM): MO = mainland, "
+                          "SEZAD, SHRFZ, SLLFZ, AFZ, OTH"),
             F("postal_code"),
             F("country", "Link", options="Country"),
             F("country_code", "Data", "Country Code (ISO 3166-1)", length=2, default="AE", reqd=1),
+            S("sb_contact", "Contact"),
+            F("contact_name"),
+            F("contact_phone", "Data", "Contact Telephone", options="Phone",
+              description="Required on Oman invoices (seller telephone, IBR-011-OM)."),
+            C("cb_contact"),
+            F("contact_email", "Data", "Contact Email", options="Email"),
             S("sb_route", "Routing"),
             F("erp_connection", "Link", "ERP Connection", options="ERP Connection"),
             F("asp_connection", "Link", "ASP Connection", options="ASP Connection"),
@@ -318,6 +356,13 @@ DOCTYPES = {
               read_only=1, search_index=1),
             F("invoice_number", in_list_view=1, read_only=1, search_index=1),
             F("invoice_date", "Date", read_only=1),
+            F("document_uuid", "Data", "Document UUID", read_only=1, search_index=1,
+              description="Invoice UUID where the country requires one (Oman BTOM-002)."),
+            F("country_code", "Data", "Country", length=2, read_only=1, in_standard_filter=1, search_index=1,
+              description="Country of the compliance engine that processed this document."),
+            F("peppol_delivery_expected", "Check", "Peppol Delivery Expected", default="1", read_only=1,
+              description="Cleared when the receiver is outside Peppol (e.g. Oman B2C or export): the provider only "
+                          "reports to the tax authority, and a confirmed report completes the document as 'Reported'."),
             F("duplicate_of", "Link", options="Invoice Transaction", read_only=1),
             S("sb_parties", "Parties and Totals"),
             F("supplier_name", read_only=1),
@@ -326,9 +371,9 @@ DOCTYPES = {
             F("customer_tax_id", "Data", "Customer Tax ID", read_only=1),
             C("cb1"),
             F("currency", "Data", length=3, read_only=1),
-            F("subtotal", "Float", precision="2", read_only=1),
-            F("tax_total", "Float", precision="2", read_only=1),
-            F("grand_total", "Float", precision="2", read_only=1, in_list_view=1),
+            F("subtotal", "Float", precision="3", read_only=1),
+            F("tax_total", "Float", precision="3", read_only=1),
+            F("grand_total", "Float", precision="3", read_only=1, in_list_view=1),
             S("sb_erp", "ERP"),
             F("erp_connection", "Link", "ERP Connection", options="ERP Connection", read_only=1),
             F("erp_document_id", "Data", "ERP Document ID", read_only=1, search_index=1),
@@ -452,7 +497,7 @@ REST_AUTH = sel("None", "API Key", "Bearer Token", "OAuth2 Client Credentials", 
     "Custom Header", "HMAC-SHA256", "JWT", "Plugin")
 PLATFORM_FIELDS = sel("success", "asp_document_id", "submission_reference", "submission_status", "fta_status",
     "fta_reference", "delivery_status", "delivery_reference", "error_code", "error_message", "xml_url", "pdf_url",
-    "timestamp")
+    "timestamp", "invoice_mls_code", "tdd_mls_code")
 INTEGRATION_STATUS = sel("Not Started", "Skeleton - Pending API Documentation", "In Development", "Sandbox Tested",
     "Production Verified")
 ENV = sel("Sandbox", "Production")
@@ -493,12 +538,12 @@ _after("Invoice Transaction", "asp_reference",
     F("asp_submission_status", "Select", "ASP Submission Status", read_only=1, in_standard_filter=1,
       options=sel("Not Submitted", "Queued", "Submitted", "Accepted", "Rejected"), default="Not Submitted"))
 _after("Invoice Transaction", "delivered_at",
-    S("sb_fta", "FTA Reporting and Peppol Delivery"),
-    F("fta_status", "Select", "FTA Reporting Status", read_only=1, in_standard_filter=1, in_list_view=1,
+    S("sb_fta", "Tax Authority Reporting and Peppol Delivery"),
+    F("fta_status", "Select", "Tax Authority Reporting Status", read_only=1, in_standard_filter=1, in_list_view=1,
       options=sel("Not Applicable", "Pending", "Reported", "Rejected"), default="Not Applicable"),
-    F("fta_reference", "Data", "FTA Reporting Reference", read_only=1),
-    F("fta_message", "Small Text", "FTA Message", read_only=1),
-    F("fta_reported_at", "Datetime", "FTA Reported At", read_only=1),
+    F("fta_reference", "Data", "Tax Authority Reporting Reference", read_only=1),
+    F("fta_message", "Small Text", "Tax Authority Message", read_only=1),
+    F("fta_reported_at", "Datetime", "Tax Authority Reported At", read_only=1),
     C("cb_fta"),
     F("delivery_status", "Select", "Peppol Delivery Status", read_only=1, in_standard_filter=1, in_list_view=1,
       options=sel("Not Applicable", "Pending", "Delivered", "Failed"), default="Not Applicable"),
@@ -719,6 +764,7 @@ DOCTYPES.update({
             F("asp_connection", "Link", "ASP Connection", options="ASP Connection", read_only=1, in_standard_filter=1),
             F("operation", read_only=1, in_list_view=1, in_standard_filter=1),
             F("transaction", "Link", options="Invoice Transaction", read_only=1, search_index=1),
+            F("country_code", "Data", "Country", length=2, read_only=1, in_standard_filter=1),
             C("cb0"),
             F("result", "Select", options=sel("Success", "Failure"), read_only=1, in_list_view=1, in_standard_filter=1),
             F("http_method", "Data", "HTTP Method", read_only=1),

@@ -14,7 +14,7 @@ SUMMARY_FIELDS = ["name", "direction", "document_type", "status", "invoice_numbe
 	"asp_reference", "asp_status", "asp_message", "retry_count", "next_retry_at", "last_error", "submitted_at",
 	"delivered_at", "duplicate_of", "creation", "modified", "validation_status", "asp_submission_status",
 	"asp_error_code", "fta_status", "fta_reference", "fta_message", "delivery_status", "delivery_reference",
-	"delivery_message", "accredited_provider", "source_erp"]
+	"delivery_message", "accredited_provider", "source_erp", "country_code", "document_uuid"]
 PAYLOAD_TYPES = ("Source ERP", "Canonical", "Compliance Document", "ASP Response", "ASP Inbound", "ERP Response",
 	"ASP Document")
 
@@ -46,9 +46,12 @@ def get_status(transaction=None, erp_document_id=None, invoice_number=None, tena
 
 
 @frappe.whitelist()
-def list_transactions(status=None, direction=None, company=None, modified_after=None, start=0, limit=50, tenant=None):
+def list_transactions(status=None, direction=None, company=None, modified_after=None, start=0, limit=50, tenant=None,
+		country=None):
 	tenant = resolve_api_tenant(tenant)
 	filters = {"tenant": tenant}
+	if country:
+		filters["country_code"] = country
 	if status:
 		filters["status"] = status
 	if direction:
