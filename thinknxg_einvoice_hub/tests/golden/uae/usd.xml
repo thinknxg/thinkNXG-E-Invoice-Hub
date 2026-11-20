@@ -4,11 +4,17 @@
   <cbc:ProfileID>urn:peppol:bis:billing</cbc:ProfileID>
   <cbc:ProfileExecutionID>00000000</cbc:ProfileExecutionID>
   <cbc:ID>INV-1</cbc:ID>
+  <cbc:UUID>050dda10-0ff6-5566-b6c2-c0c9919d0b7b</cbc:UUID>
   <cbc:IssueDate>2026-11-11</cbc:IssueDate>
   <cbc:DueDate>2026-12-11</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
   <cbc:DocumentCurrencyCode>USD</cbc:DocumentCurrencyCode>
   <cbc:TaxCurrencyCode>AED</cbc:TaxCurrencyCode>
+  <cac:AdditionalDocumentReference>
+    <cbc:ID>AED</cbc:ID>
+    <cbc:DocumentTypeCode>aedtotal-incl-vat</cbc:DocumentTypeCode>
+    <cbc:DocumentDescription>7712.25</cbc:DocumentDescription>
+  </cac:AdditionalDocumentReference>
   <cac:AccountingSupplierParty>
     <cac:Party>
       <cbc:EndpointID schemeID="0235">1000000000</cbc:EndpointID>
@@ -28,6 +34,7 @@
       </cac:PartyTaxScheme>
       <cac:PartyLegalEntity>
         <cbc:RegistrationName>ABC Trading LLC</cbc:RegistrationName>
+        <cbc:CompanyID schemeAgencyID="TL" schemeAgencyName="Dubai Department of Economy and Tourism">CN-1234567</cbc:CompanyID>
       </cac:PartyLegalEntity>
     </cac:Party>
   </cac:AccountingSupplierParty>
@@ -53,8 +60,17 @@
       </cac:PartyLegalEntity>
     </cac:Party>
   </cac:AccountingCustomerParty>
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>1</cbc:PaymentMeansCode>
+  </cac:PaymentMeans>
+  <cac:TaxExchangeRate>
+    <cbc:SourceCurrencyCode>USD</cbc:SourceCurrencyCode>
+    <cbc:TargetCurrencyCode>AED</cbc:TargetCurrencyCode>
+    <cbc:CalculationRate>3.6725</cbc:CalculationRate>
+  </cac:TaxExchangeRate>
   <cac:TaxTotal>
     <cbc:TaxAmount currencyID="USD">100.00</cbc:TaxAmount>
+    <cbc:TaxIncludedIndicator>false</cbc:TaxIncludedIndicator>
     <cac:TaxSubtotal>
       <cbc:TaxableAmount currencyID="USD">2000.00</cbc:TaxableAmount>
       <cbc:TaxAmount currencyID="USD">100.00</cbc:TaxAmount>
@@ -81,6 +97,7 @@
     <cbc:InvoicedQuantity unitCode="C62">2</cbc:InvoicedQuantity>
     <cbc:LineExtensionAmount currencyID="USD">2000.00</cbc:LineExtensionAmount>
     <cac:Item>
+      <cbc:Description>Consulting</cbc:Description>
       <cbc:Name>Consulting</cbc:Name>
       <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
@@ -92,6 +109,18 @@
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="USD">1000</cbc:PriceAmount>
+      <cbc:BaseQuantity unitCode="C62">1</cbc:BaseQuantity>
+      <cac:AllowanceCharge>
+        <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+        <cbc:Amount currencyID="USD">0</cbc:Amount>
+        <cbc:BaseAmount currencyID="USD">1000</cbc:BaseAmount>
+      </cac:AllowanceCharge>
     </cac:Price>
+    <cac:ItemPriceExtension>
+      <cbc:Amount currencyID="AED">7712.25</cbc:Amount>
+      <cac:TaxTotal>
+        <cbc:TaxAmount currencyID="AED">367.25</cbc:TaxAmount>
+      </cac:TaxTotal>
+    </cac:ItemPriceExtension>
   </cac:InvoiceLine>
 </Invoice>

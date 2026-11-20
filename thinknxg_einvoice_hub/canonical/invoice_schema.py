@@ -41,11 +41,15 @@ The canonical invoice is a plain JSON-serialisable ``dict``::
     }
 
 PARTY: legal_name, trading_name, tax_id, tin, endpoint_scheme, legal_registration_id,
-       legal_registration_type, address{street, additional_street, city, postal_code,
-       subdivision, country}, contact{name, phone, email}
+       legal_registration_type, legal_registration_authority, address{street, additional_street,
+       city, postal_code, subdivision, country}, contact{name, phone, email}
 LINE:  line_id, item_code, item_name, description, quantity, unit_code, unit_price,
        price_base_quantity, discount_amount, net_amount, tax_category, tax_rate, tax_amount,
-       exemption_reason, exemption_reason_code, commodity_code
+       exemption_reason, exemption_reason_code, commodity_code, item_type
+       UAE (PINT AE) only: rcm_goods_type, standard_item_id, standard_item_scheme, service_accounting_code
+
+Optional document keys: uuid, issue_time, invoice_period{start_date, end_date, frequency_code}.
+Optional reference keys: original_invoice_uuid, credit_reason_code, credit_reason.
 """
 
 from thinknxg_einvoice_hub.utils import get_path, issue, to_decimal

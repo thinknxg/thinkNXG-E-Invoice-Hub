@@ -4,6 +4,7 @@
   <cbc:ProfileID>urn:peppol:bis:billing</cbc:ProfileID>
   <cbc:ProfileExecutionID>00000000</cbc:ProfileExecutionID>
   <cbc:ID>INV-2026-001</cbc:ID>
+  <cbc:UUID>809addf4-23cb-5f64-8b0e-8cf8fb4760c0</cbc:UUID>
   <cbc:IssueDate>2026-11-11</cbc:IssueDate>
   <cbc:DueDate>2026-12-11</cbc:DueDate>
   <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
@@ -27,7 +28,7 @@
       </cac:PartyTaxScheme>
       <cac:PartyLegalEntity>
         <cbc:RegistrationName>ABC Trading LLC</cbc:RegistrationName>
-        <cbc:CompanyID schemeAgencyID="TL">CN-1234567</cbc:CompanyID>
+        <cbc:CompanyID schemeAgencyID="TL" schemeAgencyName="Dubai Department of Economy and Tourism">CN-1234567</cbc:CompanyID>
       </cac:PartyLegalEntity>
     </cac:Party>
   </cac:AccountingSupplierParty>
@@ -55,12 +56,16 @@
   </cac:AccountingCustomerParty>
   <cac:PaymentMeans>
     <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+    <cac:PayeeFinancialAccount>
+      <cbc:ID>AE070331234567890123456</cbc:ID>
+    </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
   <cac:PaymentTerms>
     <cbc:Note>Net 30</cbc:Note>
   </cac:PaymentTerms>
   <cac:TaxTotal>
     <cbc:TaxAmount currencyID="AED">100.00</cbc:TaxAmount>
+    <cbc:TaxIncludedIndicator>false</cbc:TaxIncludedIndicator>
     <cac:TaxSubtotal>
       <cbc:TaxableAmount currencyID="AED">2000.00</cbc:TaxableAmount>
       <cbc:TaxAmount currencyID="AED">100.00</cbc:TaxAmount>
@@ -84,6 +89,7 @@
     <cbc:InvoicedQuantity unitCode="HUR">2</cbc:InvoicedQuantity>
     <cbc:LineExtensionAmount currencyID="AED">2000.00</cbc:LineExtensionAmount>
     <cac:Item>
+      <cbc:Description>Consulting Service</cbc:Description>
       <cbc:Name>Consulting Service</cbc:Name>
       <cac:SellersItemIdentification>
         <cbc:ID>ITEM-001</cbc:ID>
@@ -98,6 +104,18 @@
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="AED">1000</cbc:PriceAmount>
+      <cbc:BaseQuantity unitCode="HUR">1</cbc:BaseQuantity>
+      <cac:AllowanceCharge>
+        <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+        <cbc:Amount currencyID="AED">0</cbc:Amount>
+        <cbc:BaseAmount currencyID="AED">1000</cbc:BaseAmount>
+      </cac:AllowanceCharge>
     </cac:Price>
+    <cac:ItemPriceExtension>
+      <cbc:Amount currencyID="AED">2100.00</cbc:Amount>
+      <cac:TaxTotal>
+        <cbc:TaxAmount currencyID="AED">100.00</cbc:TaxAmount>
+      </cac:TaxTotal>
+    </cac:ItemPriceExtension>
   </cac:InvoiceLine>
 </Invoice>
