@@ -4,7 +4,7 @@
 
 Architecture: `ERP connectors -> canonical invoice -> compliance engine -> ASP adapters`, with
 framework-free connectors, adapters and engines, and `core/`, `services/`, `api/` on top of thinkNXG
-Framework v16. Working and bench-tested: canonical model and mapper, UAE PINT AE engine (baseline),
+Framework v16. Working and bench-tested: canonical model and mapper, UAE PINT AE 1.0.5 engine (official Schematron pass on fixtures since 0.3.1),
 outbound and inbound pipelines, retry engine, reconciliation, signed webhooks, Universal API, tenant
 isolation, ERPNext / thinkNXG ERP connector (not run against a live ERP), Universal API / Custom ERP
 connector, sandbox and Generic REST (JSON options) ASP adapters.

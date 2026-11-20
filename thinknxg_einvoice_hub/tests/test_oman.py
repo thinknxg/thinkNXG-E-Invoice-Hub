@@ -1,4 +1,4 @@
-"""Framework-independent tests for the Oman Fawtara (PINT OM) engine, plus the UAE regression goldens.
+"""Framework-independent tests for the Oman Fawtara (PINT OM) engine (UAE tests: test_uae.py).
 
 Run from the app folder without a bench:
     python -m unittest thinknxg_einvoice_hub.tests.test_oman
@@ -8,8 +8,6 @@ PINT OM 1.0.1 resources and install ``saxonche``; the TestOfficialSchematron cas
 fixture through the official Schematron and require zero errors and zero warnings.
 """
 
-import copy
-import json
 import os
 import unittest
 import xml.etree.ElementTree as ET
@@ -26,7 +24,6 @@ from thinknxg_einvoice_hub.exceptions import PermanentError
 from thinknxg_einvoice_hub.tests import oman_fixtures as F
 from thinknxg_einvoice_hub.tests.mock_oman_provider import recompute_uuid
 
-HERE = os.path.dirname(__file__)
 
 
 def engine(**settings):
@@ -369,36 +366,6 @@ class TestERPNextOman(unittest.TestCase):
 		self.assertEqual(out["lines"][0]["tax_amount"], 0.5)
 		self.assertEqual(out["lines"][1]["tax_category"], "ZERO_RATED")
 		self.assertNotIn("exemption_reason_code", out["lines"][1])
-
-
-class TestUAERegression(unittest.TestCase):
-	"""UAE PINT AE output must stay byte-identical to v0.2.0 (goldens generated from commit f219875)."""
-
-	def cases(self):
-		from thinknxg_einvoice_hub.tests import test_engine as T
-
-		with open(os.path.join(HERE, "..", "..", "samples", "canonical_invoice.json"), encoding="utf-8") as f:
-			sample = json.load(f)
-		cases = {"sample": sample, "test_invoice": copy.deepcopy(T.INVOICE)}
-		cn = copy.deepcopy(T.INVOICE)
-		cn["document"].update(document_type="CREDIT_NOTE", invoice_number="CN-1")
-		cn["references"] = {"original_invoice_number": "INV-1", "original_invoice_date": "2026-11-11"}
-		cases["credit_note"] = cn
-		usd = copy.deepcopy(T.INVOICE)
-		usd["document"].update(currency="USD", exchange_rate="3.6725")
-		cases["usd"] = usd
-		mixed = copy.deepcopy(T.INVOICE)
-		mixed["lines"].append({"item_name": "Export svc", "quantity": 1, "unit_price": 333.335, "tax_category": "ZERO_RATED",
-			"tax_rate": 0, "exemption_reason_code": "VATEX-AE-..."})
-		cases["mixed"] = mixed
-		return cases
-
-	def test_uae_xml_is_byte_identical(self):
-		e = get_engine("uae_pint_ae")
-		for name, inv in self.cases().items():
-			with self.subTest(name):
-				with open(os.path.join(HERE, "golden", "uae", f"{name}.xml"), encoding="utf-8") as f:
-					self.assertEqual(e.generate_document(e.enrich(normalize(inv)))["content"], f.read())
 
 
 @unittest.skipUnless(os.environ.get("OM_PINT_RESOURCES"), "set OM_PINT_RESOURCES to the official PINT OM resources")

@@ -13,7 +13,7 @@ from thinknxg_einvoice_hub.utils import currency_places, fnum, money, to_decimal
 ZERO = Decimal("0")
 DEFAULT_UNIT_CODE = "C62"  # UN/ECE Rec 20 "one"
 PARTY_TEXT = ("legal_name", "trading_name", "tax_id", "tin", "endpoint_scheme", "legal_registration_id",
-	"legal_registration_type", "identifier", "identifier_scheme", "uuid")
+	"legal_registration_type", "legal_registration_authority", "identifier", "identifier_scheme", "uuid")
 ADDRESS_TEXT = ("street", "additional_street", "city", "postal_code", "subdivision", "country")
 
 

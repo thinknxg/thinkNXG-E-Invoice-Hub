@@ -1,4 +1,8 @@
-"""Canonical invoice <-> UBL 2.1 Invoice / CreditNote in the PINT AE layout."""
+"""Canonical invoice <-> UBL 2.1 Invoice / CreditNote in the Peppol PINT AE 1.0.5 layout.
+
+Element bindings follow the official PINT AE 1.0.5 example documents and rules
+(BTAE-* are UAE extension terms, IBT-* PINT terms).
+"""
 
 from decimal import Decimal
 
@@ -13,22 +17,24 @@ from thinknxg_einvoice_hub.compliance.shared.xml import (
 	render_document,
 	text_of,
 )
-from thinknxg_einvoice_hub.compliance.uae import tax_rules
+from thinknxg_einvoice_hub.compliance.uae import codes, tax_rules
 from thinknxg_einvoice_hub.exceptions import PermanentError
 from thinknxg_einvoice_hub.utils import money, to_decimal
 
 ZERO = Decimal("0")
 
-# (document_type, invoice_kind) -> UNCL 1001 code used by PINT AE
+# (document_type, invoice_kind) -> UNCL 1001 code used by PINT AE 1.0.5
+# billing: invoice 380 / 480 (out of scope of VAT), credit note 381 / 81 (related to goods or services);
+# self-billing: invoice 389 / 480, credit note 261 / 81 (official code lists UNCL1001-inv / -cn).
 TYPE_CODES = {
 	("INVOICE", "TAX"): "380",
 	("INVOICE", "COMMERCIAL"): "480",
 	("CREDIT_NOTE", "TAX"): "381",
 	("CREDIT_NOTE", "COMMERCIAL"): "81",
 	("SELF_BILLING_INVOICE", "TAX"): "389",
-	("SELF_BILLING_INVOICE", "COMMERCIAL"): "389",
+	("SELF_BILLING_INVOICE", "COMMERCIAL"): "480",
 	("SELF_BILLING_CREDIT_NOTE", "TAX"): "261",
-	("SELF_BILLING_CREDIT_NOTE", "COMMERCIAL"): "261",
+	("SELF_BILLING_CREDIT_NOTE", "COMMERCIAL"): "81",
 }
 CODE_TYPES = {
 	"380": ("INVOICE", "TAX"),
@@ -40,6 +46,8 @@ CODE_TYPES = {
 }
 CREDIT_TYPES = ("CREDIT_NOTE", "SELF_BILLING_CREDIT_NOTE")
 SELF_BILLING = ("SELF_BILLING_INVOICE", "SELF_BILLING_CREDIT_NOTE")
+AED = "AED"
+GTIN_SCHEME = "0160"
 
 
 def _amt(value):
@@ -78,7 +86,9 @@ def _party(party, default_scheme):
 		tax_scheme,
 		cac("PartyLegalEntity",
 			cbc("RegistrationName", party.get("legal_name")),
-			cbc("CompanyID", party.get("legal_registration_id"), schemeAgencyID=party.get("legal_registration_type")),
+			# BTAE-15/16 type and BTAE-11/12 authority (passport: BTAE-18/19 issuing country)
+			cbc("CompanyID", party.get("legal_registration_id"), schemeAgencyID=party.get("legal_registration_type"),
+				schemeAgencyName=party.get("legal_registration_authority")),
 		),
 		cac("Contact",
 			cbc("Name", contact.get("name")),
@@ -88,26 +98,44 @@ def _party(party, default_scheme):
 	)
 
 
-def _tax_category(tag, category, rate, reason=None, reason_code=None):
+def _percent(category, rate, context):
+	"""Where PINT AE wants a percent: never for O; for E only on document level allowances / charges
+	(aligned-ibrp-e-05/-06/-07, ibr-121-ae); always for S, Z, AE and N."""
+	if category == "OUT_OF_SCOPE":
+		return None
+	if category == "EXEMPT" and context != "allowance":
+		return None
+	return _num(rate)
+
+
+def _tax_category(tag, category, rate, context, reason=None, reason_code=None):
+	if category == "STANDARD":
+		reason = reason_code = None  # aligned-ibrp-s-10: no exemption reason on standard rate
 	return cac(tag,
 		cbc("ID", tax_rules.category_code(category)),
-		cbc("Percent", None if category == "OUT_OF_SCOPE" else _num(rate)),
+		cbc("Percent", _percent(category, rate, context)),
 		cbc("TaxExemptionReasonCode", reason_code),
 		cbc("TaxExemptionReason", reason),
 		cac("TaxScheme", cbc("ID", "VAT")),
 	)
 
 
-def _line(line, currency, credit):
+def _line(line, currency, rate, credit):
+	category = line.get("tax_category")
 	discount = to_decimal(line.get("discount_amount"), ZERO)
 	name = line.get("item_name") or line.get("description")
-	description = line.get("description") if line.get("description") != name else None
-	base = to_decimal(line.get("price_base_quantity"), Decimal("1"))
+	description = line.get("description") or name  # IBT-154 is mandatory in PINT AE (ibr-125-ae)
+	base = to_decimal(line.get("price_base_quantity"), Decimal("1")) or Decimal("1")
+	price = to_decimal(line.get("unit_price"), ZERO)
+	net = money(line.get("net_amount")) or ZERO
+	tax = money(line.get("tax_amount")) or ZERO
+	tax_aed = money(tax * rate)
+	reasons = category in ("EXEMPT", "OUT_OF_SCOPE")
 	return cac("CreditNoteLine" if credit else "InvoiceLine",
 		cbc("ID", line.get("line_id")),
 		cbc("Note", line.get("note")),
 		cbc("CreditedQuantity" if credit else "InvoicedQuantity", _num(line.get("quantity")), unitCode=line.get("unit_code")),
-		cbc("LineExtensionAmount", _amt(line.get("net_amount")), currencyID=currency),
+		cbc("LineExtensionAmount", _amt(net), currencyID=currency),
 		cac("AllowanceCharge",
 			cbc("ChargeIndicator", "false"),
 			cbc("AllowanceChargeReason", "Discount"),
@@ -117,23 +145,44 @@ def _line(line, currency, credit):
 			cbc("Description", description),
 			cbc("Name", name),
 			cac("SellersItemIdentification", cbc("ID", line.get("item_code"))),
-			cac("CommodityClassification", cbc("ItemClassificationCode", line.get("commodity_code"), listID="HS")),
-			_tax_category("ClassifiedTaxCategory", line.get("tax_category"), line.get("tax_rate")),
+			cac("StandardItemIdentification", cbc("ID", line.get("standard_item_id"),
+				schemeID=line.get("standard_item_scheme") or GTIN_SCHEME)),
+			# BTAE-17 service accounting code (mandatory for services up to PINT AE 1.0.4, optional in 1.0.5)
+			cac("AdditionalItemIdentification", cbc("ID", line.get("service_accounting_code"), schemeID="SAC")),
+			cac("CommodityClassification",
+				cbc("NatureCode", line.get("rcm_goods_type")),          # BTAE-09
+				cbc("CommodityCode", line.get("item_type")),            # BTAE-13
+				cbc("ItemClassificationCode", line.get("commodity_code"), listID="HS"),
+			),
+			_tax_category("ClassifiedTaxCategory", category, line.get("tax_rate"), "line",
+				line.get("exemption_reason") if reasons else None,
+				line.get("exemption_reason_code") if reasons else None),
 		),
 		cac("Price",
-			cbc("PriceAmount", _num(line.get("unit_price")), currencyID=currency),
-			cbc("BaseQuantity", _num(base), unitCode=line.get("unit_code")) if base != 1 else None,
+			cbc("PriceAmount", _num(price), currencyID=currency),
+			cbc("BaseQuantity", _num(base), unitCode=line.get("unit_code")),
+			cac("AllowanceCharge",                                     # IBT-148 gross price (ibr-126-ae)
+				cbc("ChargeIndicator", "false"),
+				cbc("Amount", "0", currencyID=currency),
+				cbc("BaseAmount", _num(price), currencyID=currency),
+			),
+		),
+		cac("ItemPriceExtension",
+			cbc("Amount", _amt((net + tax) * rate), currencyID=AED),    # BTAE-10, line amount incl. VAT in AED
+			# BTAE-08 line VAT in AED; not allowed for exempt lines (ibr-163-ae)
+			None if category == "EXEMPT" else cac("TaxTotal", cbc("TaxAmount", _amt(tax_aed), currencyID=AED)),
 		),
 	)
 
 
 def build(inv, profile):
-	"""Render a normalised canonical invoice as PINT AE UBL XML."""
+	"""Render a normalised canonical invoice as PINT AE 1.0.5 UBL XML."""
 	doc = inv.get("document") or {}
 	totals = inv.get("totals") or {}
 	refs = inv.get("references") or {}
 	payment = inv.get("payment") or {}
 	delivery = inv.get("delivery") or {}
+	period = doc.get("invoice_period") or {}
 	doc_type = doc.get("document_type")
 	kind = doc.get("invoice_kind") or "TAX"
 	type_code = TYPE_CODES.get((doc_type, kind))
@@ -143,32 +192,58 @@ def build(inv, profile):
 	selfbilling = doc_type in SELF_BILLING
 	currency = doc.get("currency")
 	tax_currency = doc.get("tax_currency") or profile.get("default_currency") or currency
+	foreign = bool(currency) and currency != AED
+	rate = (to_decimal(doc.get("exchange_rate"), Decimal("1")) or Decimal("1")) if foreign else Decimal("1")
 	scheme = profile.get("endpoint_scheme")
+	flags = doc.get("transaction_type_flags")
+	reason_code = refs.get("credit_reason_code")
+	invoice_date = doc.get("invoice_date") or ""
+	tax_point = doc.get("tax_point_date")
+	if credit or not tax_point or str(tax_point) >= str(invoice_date):
+		tax_point = None  # ibr-124-ae / ibr-141-ae: only when earlier than the issue date, never on credit notes
 
 	children = [
 		cbc("CustomizationID", profile["selfbilling_customization_id" if selfbilling else "customization_id"]),
 		cbc("ProfileID", profile["selfbilling_profile_id" if selfbilling else "profile_id"]),
-		cbc("ProfileExecutionID", doc.get("transaction_type_flags")),
+		cbc("ProfileExecutionID", flags),
 		cbc("ID", doc.get("invoice_number")),
-		cbc("IssueDate", doc.get("invoice_date")),
+		cbc("UUID", doc.get("uuid")),
+		cbc("IssueDate", invoice_date),
+		cbc("IssueTime", doc.get("issue_time")),
 	]
 	if credit:
-		children += [cbc("TaxPointDate", doc.get("tax_point_date")), cbc("CreditNoteTypeCode", type_code),
-			cbc("Note", doc.get("notes"))]
+		children += [cbc("CreditNoteTypeCode", type_code), cbc("Note", doc.get("notes"))]
 	else:
 		children += [cbc("DueDate", doc.get("due_date")), cbc("InvoiceTypeCode", type_code),
-			cbc("Note", doc.get("notes")), cbc("TaxPointDate", doc.get("tax_point_date"))]
+			cbc("Note", doc.get("notes")), cbc("TaxPointDate", tax_point)]
 	children += [
 		cbc("DocumentCurrencyCode", currency),
 		cbc("TaxCurrencyCode", tax_currency if tax_currency != currency else None),
 		cbc("BuyerReference", doc.get("buyer_reference")),
-		cac("OrderReference", cbc("ID", refs.get("order_reference"))),
-		cac("BillingReference", cac("InvoiceDocumentReference",
+		cac("InvoicePeriod",
+			cbc("StartDate", period.get("start_date")),
+			cbc("EndDate", period.get("end_date")),
+			cbc("DescriptionCode", period.get("frequency_code")),   # IBT-008 frequency of billing
+		),
+	]
+	if credit:
+		children.append(cac("DiscrepancyResponse",
+			cbc("ResponseCode", reason_code),                       # BTAE-03
+			cbc("Description", refs.get("credit_reason")),
+		))
+	children.append(cac("OrderReference", cbc("ID", refs.get("order_reference"))))
+	if reason_code != codes.VOLUME_DISCOUNT:  # ibr-055-ae: no preceding invoice for a volume discount
+		children.append(cac("BillingReference", cac("InvoiceDocumentReference",
 			cbc("ID", refs.get("original_invoice_number")),
 			cbc("IssueDate", refs.get("original_invoice_date")),
-		)),
-		cac("ContractDocumentReference", cbc("ID", refs.get("contract_reference"))),
-	]
+		)))
+	children.append(cac("ContractDocumentReference", cbc("ID", refs.get("contract_reference"))))
+	if foreign:
+		children.append(cac("AdditionalDocumentReference",          # BTAE-20, ibr-175-ae
+			cbc("ID", AED),
+			cbc("DocumentTypeCode", codes.AED_TOTAL_REFERENCE),
+			cbc("DocumentDescription", _amt(to_decimal(totals.get("grand_total"), ZERO) * rate)),
+		))
 	for att in inv.get("attachments") or []:
 		children.append(cac("AdditionalDocumentReference",
 			cbc("ID", att.get("id") or att.get("filename")),
@@ -184,34 +259,45 @@ def build(inv, profile):
 			cac("DeliveryLocation", _address("Address", delivery.get("address"))),
 		),
 	]
-	if payment.get("means_code") or payment.get("iban") or (credit and doc.get("due_date")):
+	# ibr-191-ae: payment means is mandatory on invoices; "1" (instrument not defined) when the ERP sent none
+	if not credit or payment.get("means_code") or payment.get("iban") or doc.get("due_date"):
 		children.append(cac("PaymentMeans",
 			cbc("PaymentMeansCode", payment.get("means_code") or "1"),
 			cbc("PaymentDueDate", doc.get("due_date")) if credit else None,
 			cac("PayeeFinancialAccount", cbc("ID", payment.get("iban")), cbc("Name", payment.get("account_name"))),
 		))
 	children.append(cac("PaymentTerms", cbc("Note", payment.get("terms"))))
-	for ac in inv.get("allowances_charges") or []:
-		children.append(cac("AllowanceCharge",
-			cbc("ChargeIndicator", "true" if ac.get("is_charge") else "false"),
-			cbc("AllowanceChargeReason", ac.get("reason")),
-			cbc("Amount", _amt(ac.get("amount")), currencyID=currency),
-			_tax_category("TaxCategory", ac.get("tax_category"), ac.get("tax_rate")),
-		))
 
-	tax_total = cac("TaxTotal", cbc("TaxAmount", _amt(totals.get("tax_total")), currencyID=currency))
+	allowances = [cac("AllowanceCharge",
+		cbc("ChargeIndicator", "true" if ac.get("is_charge") else "false"),
+		cbc("AllowanceChargeReason", ac.get("reason")),
+		cbc("Amount", _amt(ac.get("amount")), currencyID=currency),
+		_tax_category("TaxCategory", ac.get("tax_category"), ac.get("tax_rate"), "allowance",
+			ac.get("exemption_reason"), ac.get("exemption_reason_code")),
+	) for ac in inv.get("allowances_charges") or []]
+	exchange = cac("TaxExchangeRate",                                # BTAE-04, ibr-153-ae / ibr-159-ae
+		cbc("SourceCurrencyCode", currency),
+		cbc("TargetCurrencyCode", AED),
+		cbc("CalculationRate", _num(rate)),
+	) if foreign else None
+	# UBL 2.1 element order: Invoice has AllowanceCharge before TaxExchangeRate, CreditNote after it
+	children += ([exchange] + allowances) if credit else (allowances + [exchange])
+
+	tax_total = cac("TaxTotal",
+		cbc("TaxAmount", _amt(totals.get("tax_total")), currencyID=currency),
+		cbc("TaxIncludedIndicator", "false"),
+	)
 	for row in inv.get("tax_breakdown") or []:
 		tax_total.add(cac("TaxSubtotal",
 			cbc("TaxableAmount", _amt(row.get("taxable_amount")), currencyID=currency),
 			cbc("TaxAmount", _amt(row.get("tax_amount")), currencyID=currency),
-			_tax_category("TaxCategory", row.get("tax_category"), row.get("tax_rate"),
+			_tax_category("TaxCategory", row.get("tax_category"), row.get("tax_rate"), "subtotal",
 				row.get("exemption_reason"), row.get("exemption_reason_code")),
 		))
 	children.append(tax_total)
-	if tax_currency and tax_currency != currency:
-		rate = to_decimal(doc.get("exchange_rate"), Decimal("1"))
+	if foreign:
 		converted = to_decimal(totals.get("tax_total"), ZERO) * rate
-		children.append(cac("TaxTotal", cbc("TaxAmount", _amt(converted), currencyID=tax_currency)))
+		children.append(cac("TaxTotal", cbc("TaxAmount", _amt(converted), currencyID=AED)))
 
 	def optional(name, key, nonzero_only=True):
 		val = to_decimal(totals.get(key), ZERO)
@@ -227,7 +313,7 @@ def build(inv, profile):
 		optional("PayableRoundingAmount", "rounding_amount"),
 		cbc("PayableAmount", _amt(totals.get("payable_amount")), currencyID=currency),
 	))
-	children += [_line(line, currency, credit) for line in inv.get("lines") or []]
+	children += [_line(line, currency, rate, credit) for line in inv.get("lines") or []]
 
 	if credit:
 		return render_document("CreditNote", CREDIT_NOTE_NS, children)
@@ -247,6 +333,7 @@ def _parse_party(node):
 		"endpoint_scheme": attr_of(node, "cbc:EndpointID", "schemeID"),
 		"legal_registration_id": text_of(node, "cac:PartyLegalEntity/cbc:CompanyID"),
 		"legal_registration_type": attr_of(node, "cac:PartyLegalEntity/cbc:CompanyID", "schemeAgencyID"),
+		"legal_registration_authority": attr_of(node, "cac:PartyLegalEntity/cbc:CompanyID", "schemeAgencyName"),
 		"address": {
 			"street": text_of(addr, "cbc:StreetName"),
 			"additional_street": text_of(addr, "cbc:AdditionalStreetName"),
@@ -272,12 +359,21 @@ def parse(content):
 	credit = local == "CreditNote"
 	type_code = text_of(root, "cbc:CreditNoteTypeCode" if credit else "cbc:InvoiceTypeCode")
 	doc_type, kind = CODE_TYPES.get(type_code or "", ("CREDIT_NOTE" if credit else "INVOICE", "TAX"))
+	if "selfbilling" in (text_of(root, "cbc:CustomizationID") or ""):
+		doc_type = "SELF_BILLING_CREDIT_NOTE" if credit else "SELF_BILLING_INVOICE"
+	elif credit:
+		doc_type = "CREDIT_NOTE"
 	currency = text_of(root, "cbc:DocumentCurrencyCode")
 
 	lines = []
 	for node in root.findall("cac:CreditNoteLine" if credit else "cac:InvoiceLine", UBL_NS):
 		qty_path = "cbc:CreditedQuantity" if credit else "cbc:InvoicedQuantity"
 		code = text_of(node, "cac:Item/cac:ClassifiedTaxCategory/cbc:ID")
+		category = tax_rules.category_from_code(code) or code
+		# BTAE-08 is in AED, so it is the line VAT only for AED documents; RC / margin lines carry none
+		line_tax = text_of(node, "cac:ItemPriceExtension/cac:TaxTotal/cbc:TaxAmount") if currency == AED else None
+		if category in tax_rules.NO_TAX_CATEGORIES:
+			line_tax = "0"
 		lines.append({
 			"line_id": text_of(node, "cbc:ID"),
 			"item_code": text_of(node, "cac:Item/cac:SellersItemIdentification/cbc:ID"),
@@ -289,9 +385,15 @@ def parse(content):
 			"price_base_quantity": text_of(node, "cac:Price/cbc:BaseQuantity"),
 			"discount_amount": text_of(node, "cac:AllowanceCharge/cbc:Amount"),
 			"net_amount": text_of(node, "cbc:LineExtensionAmount"),
-			"tax_category": tax_rules.category_from_code(code) or code,
+			"tax_category": category,
 			"tax_rate": text_of(node, "cac:Item/cac:ClassifiedTaxCategory/cbc:Percent") or 0,
+			"tax_amount": line_tax,
+			"exemption_reason_code": text_of(node, "cac:Item/cac:ClassifiedTaxCategory/cbc:TaxExemptionReasonCode"),
+			"exemption_reason": text_of(node, "cac:Item/cac:ClassifiedTaxCategory/cbc:TaxExemptionReason"),
 			"commodity_code": text_of(node, "cac:Item/cac:CommodityClassification/cbc:ItemClassificationCode"),
+			"item_type": text_of(node, "cac:Item/cac:CommodityClassification/cbc:CommodityCode"),
+			"rcm_goods_type": text_of(node, "cac:Item/cac:CommodityClassification/cbc:NatureCode"),
+			"standard_item_id": text_of(node, "cac:Item/cac:StandardItemIdentification/cbc:ID"),
 		})
 
 	breakdown = []
@@ -318,7 +420,9 @@ def parse(content):
 			"document_type": doc_type,
 			"invoice_kind": kind,
 			"invoice_number": text_of(root, "cbc:ID"),
+			"uuid": text_of(root, "cbc:UUID"),
 			"invoice_date": text_of(root, "cbc:IssueDate"),
+			"issue_time": text_of(root, "cbc:IssueTime"),
 			"due_date": text_of(root, "cbc:DueDate") or text_of(root, "cac:PaymentMeans/cbc:PaymentDueDate"),
 			"tax_point_date": text_of(root, "cbc:TaxPointDate"),
 			"currency": currency,
@@ -328,6 +432,11 @@ def parse(content):
 			"notes": text_of(root, "cbc:Note"),
 			"buyer_reference": text_of(root, "cbc:BuyerReference"),
 			"customization_id": text_of(root, "cbc:CustomizationID"),
+			"invoice_period": {k: v for k, v in (
+				("start_date", text_of(root, "cac:InvoicePeriod/cbc:StartDate")),
+				("end_date", text_of(root, "cac:InvoicePeriod/cbc:EndDate")),
+				("frequency_code", text_of(root, "cac:InvoicePeriod/cbc:DescriptionCode")),
+			) if v} or None,
 		},
 		"supplier": _parse_party(root.find("cac:AccountingSupplierParty/cac:Party", UBL_NS)),
 		"customer": _parse_party(root.find("cac:AccountingCustomerParty/cac:Party", UBL_NS)),
@@ -354,5 +463,7 @@ def parse(content):
 			"contract_reference": text_of(root, "cac:ContractDocumentReference/cbc:ID"),
 			"original_invoice_number": text_of(root, "cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID"),
 			"original_invoice_date": text_of(root, "cac:BillingReference/cac:InvoiceDocumentReference/cbc:IssueDate"),
+			"credit_reason_code": text_of(root, "cac:DiscrepancyResponse/cbc:ResponseCode"),
+			"credit_reason": text_of(root, "cac:DiscrepancyResponse/cbc:Description"),
 		},
 	}

@@ -21,7 +21,7 @@ and Oman (Fawtara, Peppol PINT OM 1.0.1). Further countries are added as complia
 | --- | --- |
 | **Oman Fawtara engine** (`om_pint_om`, PINT OM 1.0.1): mapping, credit notes, self-billing, B2C, export, foreign currency, Invoice UUID / Seller UUID / QR, validation, official Schematron hook | Implemented; output passes the official PINT OM 1.0.1 Schematron and UBL 2.1 XSD on all test fixtures; bench tested with a **mock** provider. No accredited Oman provider integrated or sandbox-tested yet |
 | Country-aware API (`api.oman.*`), dashboard country filter, multi-country inbound routing | Implemented, bench tested |
-| Canonical invoice model, mapper, UAE PINT AE engine (baseline; see "Compliance scope") | Implemented, unit tested |
+| Canonical invoice model, mapper, UAE PINT AE 1.0.5 engine (see "Compliance scope") | Implemented, unit and bench tested; official Schematron pass on fixtures |
 | Outbound / inbound pipelines, retry engine, reconciliation, Universal API, signed webhooks | Implemented, tested on a v16 bench |
 | Independent lifecycle tracking: internal validation, ASP submission, FTA reporting, Peppol delivery, ERP sync | Implemented, tested on a v16 bench with a mock ASP |
 | Configurable REST engine: ASP REST API Configuration (auth, endpoints, headers, request / response mapping, webhooks) | Implemented, unit tested and bench tested against a mock ASP |
@@ -202,19 +202,18 @@ Classes are loaded only from installed code, never from a path stored in the dat
 * **Oman**: see `docs/OMAN_FAWTARA_SPECIFICATION.md` and `docs/OMAN_GAP_REPORT.md`. Passing the official
   Schematron is not acceptance by an accredited provider or the Oman Tax Authority; production use needs an
   accredited provider integration tested in its sandbox and the taxpayer onboarded on the Fawtara Portal.
-* **UAE, known issue**: the UAE output does not yet pass the official PINT AE Schematron (checked against the
-  2026.3, 2026.5 and 2026.11 releases); see `docs/OMAN_GAP_REPORT.md` R9.
-* The UAE engine is a PINT AE-aligned baseline (specification 1.0.3 identifiers). Its checks
-  use the hub's own rule IDs (`EIH-AE-*`) and catch data problems early; they are not the
-  official PINT AE Schematron.
-* The generated XML has not been validated against the official PINT AE validation
-  artefacts or any ASP. Do this with your chosen ASP before production use, and extend
-  `compliance/uae/` where their validation reports gaps.
+* **UAE**: the engine targets Peppol PINT AE 1.0.5. Generated documents pass the official PINT AE 1.0.5
+  Schematron (billing and self-billing) and the UBL 2.1 XSD on all test fixtures, and the official
+  Schematron can run inside the pipeline (`official_validation` in the UAE Compliance Profile's engine
+  settings). No UAE ASP or the FTA has received these documents; test with your ASP's sandbox before
+  production. Details, upgrade impact and rollback: `docs/UAE_PINT_AE_VALIDATION.md`.
+* The hub's UAE checks (`EIH-AE-*`) report missing ERP data against the canonical field before
+  submission; each names the official rule it anticipates. They do not replace the official Schematron.
 * Authoritative validation, digital signing, Peppol transmission and tax data reporting to
   the Federal Tax Authority are the Accredited Service Provider's role.
-* Predefined network endpoints for special cases (exports, buyers not yet onboarded,
-  deemed supplies) are not applied automatically; supply `customer.tin` for those cases
-  according to current Ministry of Finance guidance.
+* The official predefined buyer addresses are applied only for exports to a buyer with no TIN
+  (`9900000099`) and deemed supplies (`9900000097`); for a buyer not subject to UAE e-invoicing,
+  supply `customer.tin` = `9900000098` according to current Ministry of Finance guidance.
 * This app does not hold or imply any regulatory accreditation.
 
 ## Scaling note

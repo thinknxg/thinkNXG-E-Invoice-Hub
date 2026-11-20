@@ -14,6 +14,7 @@
   "participant_id",
   "legal_registration_id",
   "legal_registration_type",
+  "legal_registration_authority",
   "sb_addr",
   "street",
   "additional_street",
@@ -105,6 +106,12 @@
    "label": "Legal Registration Type",
    "options": "\nTL\nEID\nPAS\nCD\nCR\nTIN\nCID\nPASNUM\nOTHID\nICID\nSZLN",
    "description": "UAE: TL = Trade Licence, EID = Emirates ID, PAS = Passport, CD = Cabinet Decision. Oman (CL-06-OM): CR = Commercial Registration, TIN, CID = Civil ID, PASNUM = Passport, OTHID = Other, ICID = Importer Customs ID, SZLN = Special Zone Licence"
+  },
+  {
+   "fieldname": "legal_registration_authority",
+   "fieldtype": "Data",
+   "label": "Legal Registration Authority",
+   "description": "UAE: name of the authority that issued the trade licence (BTAE-12, required for TL), or the ISO country code that issued the passport (BTAE-19, for PAS)."
   },
   {
    "fieldname": "sb_addr",
@@ -248,7 +255,7 @@
  "issingle": 0,
  "istable": 0,
  "links": [],
- "modified": "2026-11-12 12:00:00.000000",
+ "modified": "2026-11-21 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "E Invoice Hub",
  "name": "Company Integration Profile",

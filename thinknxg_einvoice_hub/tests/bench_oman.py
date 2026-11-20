@@ -191,8 +191,9 @@ def run(resources=None):
 	name = invoice_service.ingest_inbound(tenant, asp, uae_xml, f"IN-AE-{run_id}")
 	invoice_service.process_transaction(name)
 	t = frappe.get_doc("Invoice Transaction", name)
-	check("multi-country inbound: UAE document -> UAE engine", t.country_code == "AE" and t.document_uuid is None,
-		(t.country_code, t.company_profile, t.status, t.last_error))
+	uae_uuid = uae_xml.split("<cbc:UUID>", 1)[1].split("<", 1)[0]  # BTAE-07 since 0.3.1
+	check("multi-country inbound: UAE document -> UAE engine", t.country_code == "AE" and t.document_uuid == uae_uuid,
+		(t.country_code, t.company_profile, t.status, t.document_uuid, t.last_error))
 	name = invoice_service.ingest_inbound(tenant, asp, xml, f"IN2-{run_id}")
 	invoice_service.process_transaction(name)
 	t = frappe.get_doc("Invoice Transaction", name)
@@ -221,15 +222,17 @@ def run(resources=None):
 		check("API refuses a UAE company", True)
 
 	# 14 UAE still works end to end on the same site
+	# (a UAE profile with complete legal registration data, e.g. the one bench_uae.py creates)
 	uae_profile = frappe.db.get_value("Company Integration Profile", {"compliance_profile": "uae_pint_ae",
-		"asp_connection": ["is", "set"], "enabled": 1, "tenant": ["!=", tenant]}, ["name", "tenant"], as_dict=True,
-		order_by="creation asc")
+		"asp_connection": ["is", "set"], "enabled": 1, "tenant": ["!=", tenant],
+		"legal_registration_authority": ["is", "set"]}, ["name", "tenant"], as_dict=True, order_by="creation asc")
 	if uae_profile:
 		from thinknxg_einvoice_hub.tests import test_engine as T
 
 		t = _outbound(uae_profile.tenant, uae_profile.name, T.INVOICE, f"AE-{run_id}-1")
-		check("UAE regression: sandbox flow Delivered, country AE, no UUID",
-			(t.status, t.country_code, t.document_uuid) == ("Delivered", "AE", None), (t.status, t.country_code, t.last_error))
+		check("UAE regression: sandbox flow Delivered, country AE, BTAE-07 UUID set",
+			(t.status, t.country_code, bool(t.document_uuid)) == ("Delivered", "AE", True),
+			(t.status, t.country_code, t.last_error))
 
 	frappe.db.commit()
 	failed = [r for r in RESULTS if not r[1]]
