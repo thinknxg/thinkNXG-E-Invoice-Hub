@@ -8,6 +8,7 @@ frappe.listview_settings["Invoice Transaction"] = {
 			"Validation Failed": "orange",
 			Submitted: "yellow",
 			Delivered: "green",
+			Reported: "green",
 			Rejected: "red",
 			Retrying: "orange",
 			Failed: "red",

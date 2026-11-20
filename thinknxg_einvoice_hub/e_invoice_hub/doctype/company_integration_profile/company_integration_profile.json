@@ -17,12 +17,18 @@
   "sb_addr",
   "street",
   "additional_street",
+  "address_line",
   "city",
   "cb_addr",
   "subdivision",
   "postal_code",
   "country",
   "country_code",
+  "sb_contact",
+  "contact_name",
+  "contact_phone",
+  "cb_contact",
+  "contact_email",
   "sb_route",
   "erp_connection",
   "asp_connection",
@@ -70,16 +76,17 @@
   {
    "fieldname": "tax_id",
    "fieldtype": "Data",
-   "label": "Tax Registration Number (TRN)",
+   "label": "VAT Registration Number (TRN / VATIN)",
    "reqd": 1,
    "in_list_view": 1,
-   "search_index": 1
+   "search_index": 1,
+   "description": "UAE: 15-digit TRN. Oman: VATIN, OM followed by 10 digits."
   },
   {
    "fieldname": "tin",
    "fieldtype": "Data",
-   "label": "Tax Identification Number (TIN)",
-   "description": "Network participant identifier. For the UAE this is derived from the first 10 digits of the TRN when left empty."
+   "label": "Network Address (TIN / VATIN)",
+   "description": "Network participant identifier. UAE: derived from the first 10 digits of the TRN (scheme 0235). Oman: the VATIN itself (scheme 0248). Derived when left empty."
   },
   {
    "fieldname": "participant_id",
@@ -96,8 +103,8 @@
    "fieldname": "legal_registration_type",
    "fieldtype": "Select",
    "label": "Legal Registration Type",
-   "options": "\nTL\nEID\nPAS\nCD",
-   "description": "TL = Trade Licence, EID = Emirates ID, PAS = Passport, CD = Cabinet Decision"
+   "options": "\nTL\nEID\nPAS\nCD\nCR\nTIN\nCID\nPASNUM\nOTHID\nICID\nSZLN",
+   "description": "UAE: TL = Trade Licence, EID = Emirates ID, PAS = Passport, CD = Cabinet Decision. Oman (CL-06-OM): CR = Commercial Registration, TIN, CID = Civil ID, PASNUM = Passport, OTHID = Other, ICID = Importer Customs ID, SZLN = Special Zone Licence"
   },
   {
    "fieldname": "sb_addr",
@@ -115,6 +122,12 @@
    "label": "Additional Street"
   },
   {
+   "fieldname": "address_line",
+   "fieldtype": "Data",
+   "label": "Address Line 3",
+   "description": "Required on Oman invoices together with street, additional street, city and postal code (IBR-010-OM)."
+  },
+  {
    "fieldname": "city",
    "fieldtype": "Data",
    "label": "City"
@@ -126,8 +139,8 @@
   {
    "fieldname": "subdivision",
    "fieldtype": "Data",
-   "label": "Emirate / State Code",
-   "description": "e.g. AUH, DXB, SHJ, AJM, UAQ, RAK, FUJ"
+   "label": "Emirate / Zone Code",
+   "description": "UAE emirate: AUH, DXB, SHJ, AJM, UAQ, RAK, FUJ. Oman (CL-13-OM): MO = mainland, SEZAD, SHRFZ, SLLFZ, AFZ, OTH"
   },
   {
    "fieldname": "postal_code",
@@ -147,6 +160,33 @@
    "length": 2,
    "default": "AE",
    "reqd": 1
+  },
+  {
+   "fieldname": "sb_contact",
+   "fieldtype": "Section Break",
+   "label": "Contact"
+  },
+  {
+   "fieldname": "contact_name",
+   "fieldtype": "Data",
+   "label": "Contact Name"
+  },
+  {
+   "fieldname": "contact_phone",
+   "fieldtype": "Data",
+   "label": "Contact Telephone",
+   "options": "Phone",
+   "description": "Required on Oman invoices (seller telephone, IBR-011-OM)."
+  },
+  {
+   "fieldname": "cb_contact",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "contact_email",
+   "fieldtype": "Data",
+   "label": "Contact Email",
+   "options": "Email"
   },
   {
    "fieldname": "sb_route",

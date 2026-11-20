@@ -1,0 +1,7 @@
+{
+  "_notice": "Response of the MOCK provider used in tests, not a real provider.",
+  "message": "Accepted by mock Oman provider",
+  "reference": "MOCK-OM-00005",
+  "status": "ACCEPTED",
+  "tdd_mls_code": "AP"
+}

@@ -105,7 +105,7 @@ class ConfiguredRestAdapter(b.BaseASPConnector):
 		if mapped.get("success") is False:
 			status = b.ST_REJECTED
 		extra = {k: mapped.get(k) for k in ("fta_status", "fta_reference", "delivery_status", "delivery_reference",
-			"submission_reference", "error_code", "xml_url", "pdf_url", "timestamp")}
+			"submission_reference", "error_code", "xml_url", "pdf_url", "timestamp", "invoice_mls_code", "tdd_mls_code")}
 		return b.result(status, mapped.get("asp_document_id") or reference, mapped.get("error_message"),
 			response.get("data") if not isinstance(response.get("data"), bytes) else None, **extra)
 

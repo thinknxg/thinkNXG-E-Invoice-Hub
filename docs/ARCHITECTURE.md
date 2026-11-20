@@ -45,8 +45,13 @@ There is one processing workflow. Adding an ERP or an ASP never adds a workflow.
 
 ## Lifecycle
 
-Overall status: Received, Normalized, Validated, Validation Failed, Submitted, Delivered, Rejected,
-Retrying, Failed, Duplicate, Cancelled.
+Overall status: Received, Normalized, Validated, Validation Failed, Submitted, Delivered, Reported,
+Rejected, Retrying, Failed, Duplicate, Cancelled. "Reported" (0.3.0) is the final state when the country engine
+says no Peppol delivery follows (Oman B2C / export) and the tax authority accepted the report.
+
+Countries: each transaction records `country_code` from its compliance engine; engines are described in
+`MULTI_COUNTRY_ARCHITECTURE.md`. "FTA Reporting" is the tax-authority reporting status for every country
+(Oman: the Tax Data Document MLS from the OTA access point).
 
 Four outcomes are stored separately and only move forward:
 

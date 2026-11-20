@@ -63,10 +63,21 @@ def to_decimal(value, default=None):
 		return default
 
 
-def money(value):
-	"""Round half-up to 2 decimals; ``None`` stays ``None``."""
+#: ISO 4217 currencies whose minor unit has three decimals (OMR baisa, BHD/KWD/JOD fils, ...)
+THREE_DECIMAL_CURRENCIES = frozenset(("OMR", "BHD", "KWD", "JOD", "IQD", "LYD", "TND"))
+
+
+def currency_places(currency):
+	"""Decimal places of a currency's minor unit: 3 for OMR, BHD, KWD, ...; otherwise 2."""
+	return 3 if (currency or "").upper() in THREE_DECIMAL_CURRENCIES else 2
+
+
+def money(value, places=2):
+	"""Round half-up to ``places`` decimals (default 2); ``None`` stays ``None``."""
 	d = to_decimal(value)
-	return None if d is None else d.quantize(TWO, rounding=ROUND_HALF_UP)
+	if d is None:
+		return None
+	return d.quantize(TWO if places == 2 else Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP)
 
 
 def fnum(value, places=2):

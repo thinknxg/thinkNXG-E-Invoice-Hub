@@ -8,12 +8,12 @@ import copy
 from decimal import Decimal
 
 from thinknxg_einvoice_hub.canonical.invoice_schema import CREDIT_TYPES, SCHEMA_VERSION
-from thinknxg_einvoice_hub.utils import fnum, money, to_decimal, to_iso_date
+from thinknxg_einvoice_hub.utils import currency_places, fnum, money, to_decimal, to_iso_date
 
 ZERO = Decimal("0")
 DEFAULT_UNIT_CODE = "C62"  # UN/ECE Rec 20 "one"
 PARTY_TEXT = ("legal_name", "trading_name", "tax_id", "tin", "endpoint_scheme", "legal_registration_id",
-	"legal_registration_type")
+	"legal_registration_type", "identifier", "identifier_scheme", "uuid")
 ADDRESS_TEXT = ("street", "additional_street", "city", "postal_code", "subdivision", "country")
 
 
@@ -45,7 +45,7 @@ def _party(party):
 	return party
 
 
-def _line(index, line, flip):
+def _line(index, line, flip, places=2):
 	line = dict(line)
 	qty = to_decimal(line.get("quantity"), ZERO)
 	price = to_decimal(line.get("unit_price"), ZERO)
@@ -58,25 +58,25 @@ def _line(index, line, flip):
 		net = abs(net) if net is not None else None
 		tax = abs(tax) if tax is not None else None
 	if net is None:
-		net = money(qty * price - discount)
+		net = money(qty * price - discount, places)
 	if tax is None:
-		tax = money(net * rate / 100)
+		tax = money(net * rate / 100, places)
 	line.update({
 		"line_id": _text(line.get("line_id")) or str(index + 1),
 		"quantity": fnum(qty, 6),
 		"unit_code": _text(line.get("unit_code")) or DEFAULT_UNIT_CODE,
 		"unit_price": fnum(price, 6),
 		"price_base_quantity": fnum(line.get("price_base_quantity") or 1, 6),
-		"discount_amount": fnum(discount),
-		"net_amount": fnum(net),
+		"discount_amount": fnum(discount, places),
+		"net_amount": fnum(net, places),
 		"tax_category": _code(line.get("tax_category")) or ("STANDARD" if rate > 0 else "ZERO_RATED"),
 		"tax_rate": fnum(rate, 4),
-		"tax_amount": fnum(tax),
+		"tax_amount": fnum(tax, places),
 	})
 	return line
 
 
-def _breakdown(lines, allowances_charges):
+def _breakdown(lines, allowances_charges, places=2):
 	groups = {}
 	for row in lines:
 		key = (row["tax_category"], row["tax_rate"])
@@ -91,13 +91,13 @@ def _breakdown(lines, allowances_charges):
 		amount = to_decimal(ac["amount"], ZERO)
 		signed = amount if ac.get("is_charge") else -amount
 		g["taxable"] += signed
-		g["tax"] += money(signed * to_decimal(ac["tax_rate"], ZERO) / 100)
+		g["tax"] += money(signed * to_decimal(ac["tax_rate"], ZERO) / 100, places)
 	return [
 		{
 			"tax_category": cat,
 			"tax_rate": rate,
-			"taxable_amount": fnum(g["taxable"]),
-			"tax_amount": fnum(g["tax"]),
+			"taxable_amount": fnum(g["taxable"], places),
+			"tax_amount": fnum(g["tax"], places),
 			"exemption_reason": g["reason"],
 			"exemption_reason_code": g["code"],
 		}
@@ -121,6 +121,11 @@ def normalize(inv):
 		if doc.get(key) not in (None, ""):
 			doc[key] = to_iso_date(doc[key]) or doc[key]
 
+	places = currency_places(doc["currency"])
+	for key in ("uuid", "issue_time"):
+		if key in doc:
+			doc[key] = _text(doc[key])
+
 	inv["supplier"] = _party(inv.get("supplier"))
 	inv["customer"] = _party(inv.get("customer"))
 
@@ -130,7 +135,7 @@ def normalize(inv):
 		(to_decimal(totals.get("grand_total"), ZERO) < 0)
 		or any(to_decimal(l.get("quantity"), ZERO) < 0 for l in raw_lines)
 	)
-	lines = [_line(i, l, flip) for i, l in enumerate(raw_lines)]
+	lines = [_line(i, l, flip, places) for i, l in enumerate(raw_lines)]
 	inv["lines"] = lines
 
 	acs = []
@@ -139,7 +144,7 @@ def normalize(inv):
 		rate = to_decimal(ac.get("tax_rate"), ZERO)
 		ac.update({
 			"is_charge": bool(ac.get("is_charge")),
-			"amount": fnum(abs(to_decimal(ac.get("amount"), ZERO))),
+			"amount": fnum(abs(to_decimal(ac.get("amount"), ZERO)), places),
 			"tax_category": _code(ac.get("tax_category")) or ("STANDARD" if rate > 0 else "ZERO_RATED"),
 			"tax_rate": fnum(rate, 4),
 		})
@@ -147,13 +152,13 @@ def normalize(inv):
 	inv["allowances_charges"] = acs
 
 	if not inv.get("tax_breakdown"):
-		inv["tax_breakdown"] = _breakdown(lines, acs)
+		inv["tax_breakdown"] = _breakdown(lines, acs, places)
 	else:
 		for row in inv["tax_breakdown"]:
 			row["tax_category"] = _code(row.get("tax_category"))
-			for key, places in (("tax_rate", 4), ("taxable_amount", 2), ("tax_amount", 2)):
+			for key, dp in (("tax_rate", 4), ("taxable_amount", places), ("tax_amount", places)):
 				val = to_decimal(row.get(key), ZERO)
-				row[key] = fnum(abs(val) if flip else val, places)
+				row[key] = fnum(abs(val) if flip else val, dp)
 
 	def given(key):
 		val = to_decimal(totals.get(key))
@@ -183,15 +188,15 @@ def normalize(inv):
 	if payable is None:
 		payable = grand - prepaid + rounding
 	inv["totals"] = {
-		"subtotal": fnum(subtotal),
-		"allowance_total": fnum(allowance),
-		"charge_total": fnum(charge),
-		"tax_exclusive": fnum(tax_exclusive),
-		"tax_total": fnum(tax_total),
-		"grand_total": fnum(grand),
-		"prepaid_amount": fnum(prepaid),
-		"rounding_amount": fnum(rounding),
-		"payable_amount": fnum(payable),
+		"subtotal": fnum(subtotal, places),
+		"allowance_total": fnum(allowance, places),
+		"charge_total": fnum(charge, places),
+		"tax_exclusive": fnum(tax_exclusive, places),
+		"tax_total": fnum(tax_total, places),
+		"grand_total": fnum(grand, places),
+		"prepaid_amount": fnum(prepaid, places),
+		"rounding_amount": fnum(rounding, places),
+		"payable_amount": fnum(payable, places),
 	}
 
 	refs = inv.setdefault("references", {})

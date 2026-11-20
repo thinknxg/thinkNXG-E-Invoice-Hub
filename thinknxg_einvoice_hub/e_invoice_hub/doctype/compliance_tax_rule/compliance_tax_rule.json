@@ -1,0 +1,85 @@
+{
+ "actions": [],
+ "creation": "2026-11-12 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "tax_category",
+  "tax_code",
+  "rate",
+  "treatment",
+  "effective_from",
+  "effective_to",
+  "regulatory_reference",
+  "active"
+ ],
+ "fields": [
+  {
+   "fieldname": "tax_category",
+   "fieldtype": "Select",
+   "label": "Tax Category",
+   "in_list_view": 1,
+   "reqd": 1,
+   "options": "STANDARD\nZERO_RATED\nEXEMPT\nOUT_OF_SCOPE\nREVERSE_CHARGE\nMARGIN_SCHEME"
+  },
+  {
+   "fieldname": "tax_code",
+   "fieldtype": "Data",
+   "label": "Country Category Code",
+   "in_list_view": 1,
+   "length": 10
+  },
+  {
+   "fieldname": "rate",
+   "fieldtype": "Float",
+   "label": "Rate (%)",
+   "in_list_view": 1,
+   "precision": "2"
+  },
+  {
+   "fieldname": "treatment",
+   "fieldtype": "Data",
+   "label": "Tax Treatment"
+  },
+  {
+   "fieldname": "effective_from",
+   "fieldtype": "Date",
+   "label": "Effective From",
+   "in_list_view": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "effective_to",
+   "fieldtype": "Date",
+   "label": "Effective To"
+  },
+  {
+   "fieldname": "regulatory_reference",
+   "fieldtype": "Data",
+   "label": "Regulatory Reference",
+   "length": 255
+  },
+  {
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "label": "Active",
+   "default": "1",
+   "in_list_view": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 0,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-11-12 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "E Invoice Hub",
+ "name": "Compliance Tax Rule",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0,
+ "editable_grid": 1
+}

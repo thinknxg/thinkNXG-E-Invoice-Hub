@@ -16,7 +16,7 @@ from frappe.utils import now_datetime
 from thinknxg_einvoice_hub.core.document_manager import audit
 from thinknxg_einvoice_hub.exceptions import PermanentError
 
-TERMINAL = ("Delivered", "Rejected", "Duplicate", "Cancelled")
+TERMINAL = ("Delivered", "Reported", "Rejected", "Duplicate", "Cancelled")
 #: states from which a manual reprocess is allowed
 REPROCESSABLE = ("Received", "Normalized", "Validated", "Validation Failed", "Retrying", "Failed")
 #: a later document with the same number supersedes transactions in these states

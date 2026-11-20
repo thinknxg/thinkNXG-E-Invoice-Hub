@@ -175,11 +175,28 @@ def _find_duplicate(txn, key):
 	return rows[0] if rows else None
 
 
+def _fill_preceding_reference(txn, inv):
+	"""Credit notes: take the original invoice's UUID / date from the hub's own record when the ERP
+	does not send them (countries whose engine sets ``uses_document_uuid``, e.g. Oman BTOM-031)."""
+	refs = inv.setdefault("references", {})
+	number = refs.get("original_invoice_number")
+	if not number or refs.get("original_invoice_uuid"):
+		return
+	row = frappe.db.get_value("Invoice Transaction", {"tenant": txn.tenant, "company_profile": txn.company_profile,
+		"direction": "Outbound", "invoice_number": number, "document_uuid": ["is", "set"]},
+		["document_uuid", "invoice_date"], as_dict=True, order_by="creation desc")
+	if row:
+		refs["original_invoice_uuid"] = row.document_uuid
+		refs.setdefault("original_invoice_date", str(row.invoice_date) if row.invoice_date else None)
+
+
 def _build_canonical(txn, raw, engine, company_profile=None):
 	"""Normalise, enrich and structure-check. Returns ``(invoice, issues)``."""
 	inv = normalize(raw)
 	if company_profile and txn.direction == "Outbound":
 		inv["supplier"] = fill_party_from_profile(inv.get("supplier") or {}, company_profile)
+		if getattr(engine, "uses_document_uuid", False):
+			_fill_preceding_reference(txn, inv)
 	inv = engine.enrich(inv)
 	issues = validate_structure(inv)
 	if company_profile and txn.direction == "Outbound":
@@ -190,9 +207,9 @@ def _build_canonical(txn, raw, engine, company_profile=None):
 	return inv, issues
 
 
-def _finish_validation(txn, inv, issues, engine):
+def _finish_validation(txn, inv, issues, engine, compliance_done=False):
 	"""Run compliance validation; returns True when the document may proceed."""
-	if not has_errors(issues):
+	if not has_errors(issues) and not compliance_done:
 		issues = issues + engine.validate(inv)
 	dm.set_validation_messages(txn, issues)
 	if has_errors(issues):
@@ -212,6 +229,8 @@ def _process_outbound(txn, renormalize=False):
 		return
 	profile = get_profile(txn.company_profile)
 	engine = routing_engine.get_compliance_engine(txn.compliance_profile or profile.compliance_profile)
+	if engine.country_code and txn.get("country_code") != engine.country_code:
+		txn.db_set("country_code", engine.country_code)
 
 	# 1. ERP payload -> canonical
 	inv = None if renormalize else dm.get_payload(txn.name, "Canonical")
@@ -244,10 +263,21 @@ def _process_outbound(txn, renormalize=False):
 		return
 	frappe.db.commit()
 
-	# 3. compliance document
+	# 3. compliance document (+ optional country check of the generated document, e.g. official Schematron)
 	document = engine.generate_document(inv)
 	dm.store_payload(txn, "Compliance Document", document["content"], document["format"])
+	if document.get("document_uuid"):
+		txn.db_set("document_uuid", document["document_uuid"])
+	doc_issues = engine.validate_document(document, inv)
+	if doc_issues:
+		previous = [{"severity": m.severity, "rule_id": m.rule_id, "field_path": m.field_path, "message": m.message}
+			for m in txn.validation_messages]
+		if not _finish_validation(txn, inv, previous + doc_issues, engine, compliance_done=True):
+			return
 	frappe.db.commit()
+
+	if not engine.delivery_expected(inv):
+		txn.db_set("peppol_delivery_expected", 0)
 
 	# 4. routing + submission
 	if not profile.auto_submit:
@@ -306,8 +336,20 @@ RANK = {"Not Submitted": 0, "Queued": 1, "Submitted": 2, "Accepted": 3, "Not App
 	"Reported": 2, "Delivered": 2, "Rejected": 3, "Failed": 2}
 
 
+def _country_response(txn, response):
+	"""Let the country engine add meaning to a provider result (e.g. Oman MLS codes -> reporting/delivery)."""
+	if not txn.get("compliance_profile"):
+		return response
+	try:
+		engine = routing_engine.get_compliance_engine(txn.compliance_profile)
+	except PermanentError:
+		return response
+	return engine.parse_provider_response(response) or response
+
+
 def apply_asp_result(txn, response):
 	"""Apply a normalised ASP result (from submission, status sync or webhook)."""
+	response = _country_response(txn, response)
 	status = response.get("status")
 	if status == asp.ST_FAILED:
 		raise PermanentError(response.get("message") or "ASP reported a failure")
@@ -347,6 +389,8 @@ def apply_asp_result(txn, response):
 		overall, level = "Rejected", "Warning"
 	elif delivery_state == "Delivered":
 		overall, level = "Delivered", "Info"
+	elif fta_state == "Reported" and not txn.get("peppol_delivery_expected", 1):
+		overall, level = "Reported", "Info"
 	elif delivery_state == "Failed":
 		overall, level = "Failed", "Error"
 		fields["last_error"] = response.get("delivery_message") or response.get("message") or "Peppol delivery failed"
@@ -422,7 +466,7 @@ def _process_inbound(txn, renormalize=False):
 			raw = content
 		else:
 			# the buyer is unknown until the document is parsed, so pick the engine from the tenant's profiles
-			engine = _inbound_engine(txn, profile)
+			engine = _inbound_engine(txn, profile, content)
 			raw = engine.parse_document(content)
 		raw.setdefault("document", {})["direction"] = "INBOUND"
 		if not profile:
@@ -432,6 +476,10 @@ def _process_inbound(txn, renormalize=False):
 			txn.erp_connection = profile.erp_connection
 		engine = routing_engine.get_compliance_engine(profile.compliance_profile)
 		inv, issues = _build_canonical(txn, raw, engine)
+		if engine.country_code:
+			txn.country_code = engine.country_code
+		if getattr(engine, "uses_document_uuid", False) and (inv.get("document") or {}).get("uuid"):
+			txn.document_uuid = str(inv["document"]["uuid"])[:140]
 		dm.store_payload(txn, "Canonical", inv)
 		dm.apply_canonical_header(txn, inv)
 		txn.idempotency_key = _dedupe_key(txn, inv)[:255]
@@ -450,7 +498,7 @@ def _process_inbound(txn, renormalize=False):
 	post_inbound_to_erp(txn, profile or get_profile(txn.company_profile), inv)
 
 
-def _inbound_engine(txn, profile):
+def _inbound_engine(txn, profile, content=None):
 	if profile:
 		return routing_engine.get_compliance_engine(profile.compliance_profile)
 	names = frappe.get_all("Company Integration Profile", filters={"tenant": txn.tenant, "enabled": 1},
@@ -458,7 +506,23 @@ def _inbound_engine(txn, profile):
 	names = sorted({n for n in names if n})
 	if not names:
 		raise PermanentError("No enabled company profile exists for this tenant")
+	if len(names) > 1 and content:
+		# multi-country tenant: pick the engine whose specification identifier the document declares
+		spec = _customization_id(content)
+		for name in names:
+			ids = frappe.db.get_value("Compliance Profile", name, ["customization_id", "selfbilling_customization_id"])
+			if spec and any(i and spec.startswith(i) for i in ids or ()):
+				return routing_engine.get_compliance_engine(name)
 	return routing_engine.get_compliance_engine(names[0])
+
+
+def _customization_id(content):
+	from thinknxg_einvoice_hub.compliance.shared.xml import parse_xml, text_of
+
+	try:
+		return text_of(parse_xml(content), "cbc:CustomizationID", default="") or ""
+	except Exception:
+		return ""
 
 
 def post_inbound_to_erp(txn, profile, inv):
@@ -499,6 +563,7 @@ def sync_erp_status(txn):
 			"asp_submission_status": txn.asp_submission_status,
 			"fta_status": txn.fta_status,
 			"delivery_status": txn.delivery_status,
+			"document_uuid": txn.get("document_uuid"),
 			"message": txn.asp_message or txn.last_error,
 			"messages": [
 				{"severity": m.severity, "rule_id": m.rule_id, "field": m.field_path, "message": m.message}

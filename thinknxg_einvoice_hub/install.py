@@ -88,16 +88,19 @@ def sync_catalogues():
 			continue
 		cls = get_engine_class(code)
 		country = cls.country if cls.country and frappe.db.exists("Country", cls.country) else None
+		columns = set(frappe.get_meta("Compliance Profile").get_valid_columns())
 		frappe.get_doc({
 			"doctype": "Compliance Profile",
 			"profile_name": cls.label or code,
 			"profile_code": code,
 			"engine_code": code,
 			"country": country,
+			"country_code": cls.country_code or None,
 			"standard": cls.standard,
 			"spec_version": cls.spec_version,
 			"enabled": 1,
-			**cls.profile_defaults,
+			# engine-only defaults (e.g. Oman schematron_dir) stay in code; only real columns are stored
+			**{k: v for k, v in cls.profile_defaults.items() if k in columns},
 		}).insert(ignore_permissions=True)
 
 

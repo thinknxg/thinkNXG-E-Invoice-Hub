@@ -13,7 +13,7 @@ Authority are performed by the Accredited Service Provider, not by this app.
 import re
 
 from thinknxg_einvoice_hub.compliance.base import BaseComplianceEngine
-from thinknxg_einvoice_hub.compliance.uae import ubl_generator, validator
+from thinknxg_einvoice_hub.compliance.uae import tax_rules, ubl_generator, validator
 
 TRN_RE = re.compile(r"^\d{15}$")
 
@@ -28,6 +28,10 @@ class PintAEEngine(BaseComplianceEngine):
 	code = "uae_pint_ae"
 	label = "UAE - Peppol PINT AE"
 	country = "United Arab Emirates"
+	country_code = "AE"
+	tax_authority = "Federal Tax Authority"
+	document_types = ("INVOICE", "CREDIT_NOTE", "SELF_BILLING_INVOICE", "SELF_BILLING_CREDIT_NOTE")
+	tax_categories = tuple(tax_rules.CATEGORY_CODES)
 	standard = "PINT AE / UBL 2.1"
 	spec_version = "1.0.3"
 	document_format = "XML"
@@ -52,6 +56,9 @@ class PintAEEngine(BaseComplianceEngine):
 			if party.get("tin") and not party.get("endpoint_scheme"):
 				party["endpoint_scheme"] = self.profile["endpoint_scheme"]
 		return invoice
+
+	def tax_code(self, category):
+		return tax_rules.category_code(category)
 
 	def validate(self, invoice):
 		return validator.validate(invoice)

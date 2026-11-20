@@ -10,6 +10,7 @@
   "asp_connection",
   "operation",
   "transaction",
+  "country_code",
   "cb0",
   "result",
   "http_method",
@@ -69,6 +70,14 @@
    "options": "Invoice Transaction",
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "country_code",
+   "fieldtype": "Data",
+   "label": "Country",
+   "length": 2,
+   "read_only": 1,
+   "in_standard_filter": 1
   },
   {
    "fieldname": "cb0",

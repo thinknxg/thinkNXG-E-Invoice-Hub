@@ -38,8 +38,11 @@ def get_stats(tenant=None, days=30):
 
 @frappe.whitelist()
 def get_dashboard(company=None, erp_connection=None, asp_connection=None, from_date=None, to_date=None,
-		document_type=None, fta_status=None, delivery_status=None, tenant=None):
-	"""Figures for the Universal Integration Dashboard, limited to the caller's tenants."""
+		document_type=None, fta_status=None, delivery_status=None, tenant=None, country=None, status=None):
+	"""Figures for the Universal Integration Dashboard, limited to the caller's tenants.
+
+	``country`` (ISO code of the compliance engine, e.g. AE or OM) and ``status`` narrow every invoice figure.
+	All figures are counts of real Invoice Transaction / Integration Log records."""
 	from thinknxg_einvoice_hub.core.tenant_manager import get_user_tenants
 
 	scope = {}
@@ -54,7 +57,7 @@ def get_dashboard(company=None, erp_connection=None, asp_connection=None, from_d
 	txn = dict(scope)
 	for field, value in (("company_profile", company), ("erp_connection", erp_connection),
 			("asp_connection", asp_connection), ("document_type", document_type), ("fta_status", fta_status),
-			("delivery_status", delivery_status)):
+			("delivery_status", delivery_status), ("country_code", country), ("status", status)):
 		if value:
 			txn[field] = value
 	if from_date and to_date:
@@ -87,9 +90,23 @@ def get_dashboard(company=None, erp_connection=None, asp_connection=None, from_d
 			"fta_rejected": count(t, {**txn, "fta_status": "Rejected"}) if fta_status in (None, "", "Rejected") else 0,
 			"delivery_failed": count(t, {**txn, "delivery_status": "Failed"})
 			if delivery_status in (None, "", "Failed") else 0,
-			"validation_failed": count(t, txn, status="Validation Failed"),
+			"validation_failed": count(t, {**txn, "status": "Validation Failed"}) if status in (None, "", "Validation Failed") else 0,
+			"validated": count(t, txn, validation_status="Passed"),
+			"fta_pending": count(t, {**txn, "fta_status": "Pending"}) if fta_status in (None, "", "Pending") else 0,
+			"delivered": count(t, {**txn, "delivery_status": "Delivered"}) if delivery_status in (None, "", "Delivered") else 0,
+			"retry_queue": count(t, {**txn, "status": "Retrying"}) if status in (None, "", "Retrying") else 0,
+			"failed": count(t, {**txn, "status": "Failed"}) if status in (None, "", "Failed") else 0,
 			"pending_sync": count(t, txn, erp_sync_status=["in", ["Pending", "Failed"]]),
-			"errors": count(t, txn, status=["in", ["Failed", "Retrying"]]),
+			"errors": count(t, {**txn, "status": ["in", ["Failed", "Retrying"]]}) if not status else
+			count(t, txn) if status in ("Failed", "Retrying") else 0,
 		},
+		"by_country": _by_country(txn),
 		"api_failures": count("Integration Log", scope, result="Failure"),
 	}
+
+
+def _by_country(filters):
+	"""Invoice counts per compliance country, for the country breakdown on the dashboard."""
+	rows = frappe.get_all("Invoice Transaction", filters=filters, fields=["country_code", {"COUNT": "name", "as": "total"}],
+		group_by="country_code")
+	return {(r.country_code or "Unassigned"): r.total for r in rows}

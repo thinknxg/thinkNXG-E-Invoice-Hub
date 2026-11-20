@@ -9,6 +9,7 @@ from thinknxg_einvoice_hub.utils import hook_map, load_class
 
 BUILTIN_ENGINES = {
 	"uae_pint_ae": "thinknxg_einvoice_hub.compliance.uae.pint_ae.PintAEEngine",
+	"om_pint_om": "thinknxg_einvoice_hub.compliance.oman.pint_om.PintOMEngine",
 }
 
 

@@ -24,7 +24,7 @@
    "fieldname": "target_platform_field",
    "fieldtype": "Select",
    "label": "Target Platform Field",
-   "options": "success\nasp_document_id\nsubmission_reference\nsubmission_status\nfta_status\nfta_reference\ndelivery_status\ndelivery_reference\nerror_code\nerror_message\nxml_url\npdf_url\ntimestamp",
+   "options": "success\nasp_document_id\nsubmission_reference\nsubmission_status\nfta_status\nfta_reference\ndelivery_status\ndelivery_reference\nerror_code\nerror_message\nxml_url\npdf_url\ntimestamp\ninvoice_mls_code\ntdd_mls_code",
    "reqd": 1,
    "in_list_view": 1
   },
